@@ -1,0 +1,138 @@
+
+export enum Nivel {
+  Fundamental = 'Fundamental',
+  Medio = 'Médio',
+  Superior = 'Superior'
+}
+
+export enum StatusConcurso {
+  EditalPublicado = 'Edital Publicado',
+  InscricoesAbertas = 'Inscrições Abertas',
+  EmAndamento = 'Em Andamento',
+  Encerrado = 'Encerrado'
+}
+
+export interface UserProfile {
+  name: string;
+  state: string;
+  city: string;
+  profilePicture: string;
+  plan: 'free' | 'pro';
+}
+
+export interface Concurso {
+  id: string;
+  nome: string;
+  banca: string;
+  orgao: string;
+  status: StatusConcurso;
+  cidades: string[];
+  datas: {
+    edital?: string;
+    inscricaoInicio?: string;
+    inscricaoFim?: string;
+    prova?: string;
+    horario?: string;
+  };
+  links: {
+    editalPdf?: string;
+    oficial?: string;
+    inscricoes?: string;
+    apostilas?: string;
+    cursos?: string;
+  };
+  observacoes: string;
+  imageUrl?: string;
+  subCoverUrl?: string;
+  totalVagas?: number;
+  salarioMaximo?: string;
+}
+
+export interface CargoMateriaConfig {
+  materiaId: string;
+  peso: number;
+  quantidadeQuestoes: number;
+}
+
+export interface Cargo {
+  id: string;
+  concursoId: string;
+  nome: string;
+  nivel: Nivel;
+  vagasAmplas: number;
+  vagasPcd: number;
+  vagasCR: number;
+  totalVagas: number;
+  salario: string;
+  cargaHoraria: string;
+  requisitos: string;
+  materiasConfig: CargoMateriaConfig[];
+}
+
+export interface RankingEntry {
+  id: string;
+  userName: string;
+  city: string;
+  state: string;
+  accuracyRate: number;
+  questionsResolved: number;
+  cargoId: string;
+  avatar: string;
+}
+
+export interface Materia {
+  id: string;
+  nome: string;
+  categoria?: string;
+  descricao?: string;
+  nivelCompativel: Nivel;
+}
+
+export interface Questao {
+  id: string;
+  codigo: string;
+  enunciado: string;
+  textoAssociado?: string;
+  alternativas: string[];
+  gabarito: string;
+  nivel: Nivel;
+  materiaId: string;
+  banca: string;
+  ano: string;
+  prova: string;
+  estatisticaAcerto?: string;
+  imagem?: string;
+}
+
+export interface Message {
+  id: string;
+  senderName: string;
+  text: string;
+  timestamp: Date;
+  isMe: boolean;
+  avatar?: string;
+}
+
+export interface UserProgress {
+  hoursStudied: number;
+  questionsResolved: number;
+  accuracyRate: number;
+  history: Array<{
+    questaoId: string;
+    resposta: string;
+    acertou: boolean;
+    data: string;
+    cargoId?: string;
+  }>;
+}
+
+export interface AppState {
+  concursos: Concurso[];
+  cargos: Cargo[];
+  materias: Materia[];
+  questoes: Questao[];
+  userProgress: UserProgress;
+  userProfile: UserProfile;
+  myCargosIds: string[];
+  ranking: RankingEntry[];
+}

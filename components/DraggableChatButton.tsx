@@ -20,7 +20,7 @@ const DraggableChatButton: React.FC<DraggableChatButtonProps> = ({ onClick, isOp
         const updateInitialPos = () => {
             setPosition({
                 x: window.innerWidth - 80, // 80px da direita (considerando largura do botão + margem)
-                y: window.innerHeight - 80 // 80px de baixo
+                y: window.innerHeight - 150 // Mais alto (antes era 80)
             });
         };
 

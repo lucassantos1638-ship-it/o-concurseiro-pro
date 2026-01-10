@@ -277,7 +277,7 @@ const App: React.FC = () => {
   const isUserAdmin = session.user.email === 'lucassantos1638@gmail.com';
 
   return (
-    <div className="flex h-screen bg-[#f6f6f8] overflow-hidden font-sans">
+    <div className="flex h-[100dvh] bg-[#f6f6f8] overflow-hidden font-sans">
       {!isAdmin && (
         <>
           {isSidebarOpen && (

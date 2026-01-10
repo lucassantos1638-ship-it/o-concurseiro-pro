@@ -30,7 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onAdminClick
 
   return (
     <aside className={sidebarClasses}>
-      <div className="flex h-full flex-col justify-between py-8 antialiased">
+      <div className="flex h-full flex-col py-8 antialiased overflow-y-auto">
         <div className="flex flex-col gap-8 px-4">
           <div className="flex items-center gap-3 px-2 mb-2 group cursor-pointer">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-blue-700 text-white shadow-xl shadow-primary/30 group-hover:scale-105 transition-transform">
@@ -70,7 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onAdminClick
           </nav>
         </div>
 
-        <div className="flex flex-col gap-1 px-4 border-t border-slate-100 pt-6">
+        <div className="mt-auto flex flex-col gap-1 px-4 border-t border-slate-100 pt-6 pb-24">
           {showAdmin && (
             <button onClick={onAdminClick} className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-500 hover:bg-slate-50 transition-all">
               <span className="material-symbols-outlined text-[22px]">admin_panel_settings</span>

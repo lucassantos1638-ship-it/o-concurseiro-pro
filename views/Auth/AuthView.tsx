@@ -69,9 +69,7 @@ const AuthView: React.FC = () => {
                 </div>
 
                 <div className="bg-white p-5 md:p-6 rounded-[32px] shadow-[0_45px_100px_-20px_rgba(0,0,0,0.12)] border border-slate-100/50 backdrop-blur-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-                        <span className="material-symbols-outlined text-8xl">verified_user</span>
-                    </div>
+
 
                     <div className="flex gap-2 mb-6 bg-slate-50 p-1 rounded-[20px] border border-slate-100 relative z-20">
                         <button

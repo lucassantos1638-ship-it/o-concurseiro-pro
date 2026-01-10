@@ -1,19 +1,22 @@
 
 import React, { useState } from 'react';
 import { AppState, Questao, Nivel } from '../../types';
+import { supabase } from '../../lib/supabase';
 
 interface AdminQuestoesProps {
     state: AppState;
     updateState: (newState: Partial<AppState>) => void;
+    onRefresh: () => void;
 }
 
-const AdminQuestoes: React.FC<AdminQuestoesProps> = ({ state, updateState }) => {
+const AdminQuestoes: React.FC<AdminQuestoesProps> = ({ state, updateState, onRefresh }) => {
     const [selectedNivel, setSelectedNivel] = useState<Nivel | null>(null);
     const [selectedMateriaId, setSelectedMateriaId] = useState<string | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [showTestModal, setShowTestModal] = useState(false);
     const [testAnswer, setTestAnswer] = useState<string | null>(null);
     const [previewQuestion, setPreviewQuestion] = useState<Questao | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const generateCode = () => `Q${Math.floor(1000000 + Math.random() * 9000000)}`;
 
@@ -41,13 +44,50 @@ const AdminQuestoes: React.FC<AdminQuestoesProps> = ({ state, updateState }) => 
         });
     };
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleDelete = async (id: string) => {
+
+        setLoading(true);
+        try {
+            await supabase.from('questoes').delete().eq('id', id);
+            onRefresh();
+        } catch (error) {
+            console.error('Error deleting questao:', error);
+            alert('Erro ao excluir questão');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedMateriaId || !selectedNivel) return;
-        const newQ: Questao = { id: Math.random().toString(36).substr(2, 9), ...formData, materiaId: selectedMateriaId, nivel: selectedNivel };
-        updateState({ questoes: [...state.questoes, newQ] });
-        setShowForm(false);
-        setFormData({ codigo: generateCode(), enunciado: '', textoAssociado: '', imagem: '', alternativas: Array(formData.alternativas.length).fill(''), gabarito: 'A', banca: '', ano: new Date().getFullYear().toString(), prova: '' });
+        setLoading(true);
+
+        const payload = {
+            codigo: formData.codigo,
+            enunciado: formData.enunciado,
+            texto_associado: formData.textoAssociado,
+            imagem: formData.imagem,
+            alternativas: formData.alternativas,
+            gabarito: formData.gabarito,
+            banca: formData.banca,
+            ano: formData.ano,
+            prova: formData.prova,
+            materia_id: selectedMateriaId,
+            nivel: selectedNivel
+        };
+
+        try {
+            await supabase.from('questoes').insert(payload);
+            onRefresh();
+            setShowForm(false);
+            setFormData({ codigo: generateCode(), enunciado: '', textoAssociado: '', imagem: '', alternativas: Array(formData.alternativas.length).fill(''), gabarito: 'A', banca: '', ano: new Date().getFullYear().toString(), prova: '' });
+        } catch (error) {
+            console.error('Error saving questao:', error);
+            alert('Erro ao salvar questão');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const openPreview = (q?: Questao) => {
@@ -228,7 +268,8 @@ const AdminQuestoes: React.FC<AdminQuestoesProps> = ({ state, updateState }) => 
             </div>
 
             {showForm && (
-                <form onSubmit={handleSave} className="bg-white p-5 sm:p-8 rounded-[32px] sm:rounded-[40px] border border-slate-100 space-y-6 sm:space-y-8 shadow-sm animate-in fade-in slide-in-from-top-4">
+                <form onSubmit={handleSave} className="bg-white p-5 sm:p-8 rounded-[32px] sm:rounded-[40px] border border-slate-100 space-y-6 sm:space-y-8 shadow-sm animate-in fade-in slide-in-from-top-4 relative">
+                    {loading && <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center rounded-[32px]"><div className="animate-spin h-8 w-8 border-4 border-primary rounded-full border-t-transparent"></div></div>}
                     <div className="flex justify-between items-center border-b pb-6">
                         <h4 className="text-slate-900 font-black text-xs uppercase tracking-widest">Editor de Questão</h4>
                         <div className="flex gap-2">
@@ -299,7 +340,7 @@ const AdminQuestoes: React.FC<AdminQuestoesProps> = ({ state, updateState }) => 
                             );
                         })}
                     </div>
-                    <button type="submit" className="w-full bg-emerald-600 text-white font-black py-4 sm:py-5 rounded-2xl shadow-xl shadow-emerald-500/20 uppercase text-[10px] tracking-widest active:scale-95 transition-all">Salvar Questão</button>
+                    <button type="submit" className="w-full bg-emerald-600 text-white font-black py-4 sm:py-5 rounded-2xl shadow-xl shadow-emerald-500/20 uppercase text-[10px] tracking-widest active:scale-95 transition-all" disabled={loading}>{loading ? 'Salvando...' : 'Salvar Questão'}</button>
                 </form>
             )}
 
@@ -316,7 +357,7 @@ const AdminQuestoes: React.FC<AdminQuestoesProps> = ({ state, updateState }) => 
                         <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-3 shrink-0 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-slate-50">
                             <div className="flex gap-2">
                                 <button onClick={() => openPreview(q)} className="p-2 text-slate-400 md:text-slate-300 hover:text-amber-500 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100" title="Testar Questão"><span className="material-symbols-outlined">visibility</span></button>
-                                <button onClick={() => updateState({ questoes: state.questoes.filter(item => item.id !== q.id) })} className="p-2 text-slate-400 md:text-slate-300 hover:text-red-500 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100" title="Excluir"><span className="material-symbols-outlined">delete</span></button>
+                                <button onClick={() => handleDelete(q.id)} className="p-2 text-slate-400 md:text-slate-300 hover:text-red-500 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100" title="Excluir"><span className="material-symbols-outlined">delete</span></button>
                             </div>
                             <span className="bg-emerald-50 text-emerald-600 px-3 sm:px-4 py-1.5 rounded-xl text-[9px] sm:text-[10px] font-black border border-emerald-100 tracking-widest">GABARITO: {q.gabarito}</span>
                         </div>
@@ -328,3 +369,5 @@ const AdminQuestoes: React.FC<AdminQuestoesProps> = ({ state, updateState }) => 
 };
 
 export default AdminQuestoes;
+
+

@@ -2,15 +2,18 @@
 import React, { useState } from 'react';
 import { AppState, Concurso, StatusConcurso } from '../../types';
 import { ESTADOS_BRASIL } from '../../constants';
+import { supabase } from '../../lib/supabase';
 
 interface AdminConcursosProps {
     state: AppState;
     updateState: (newState: Partial<AppState>) => void;
+    onRefresh: () => void;
 }
 
-const AdminConcursos: React.FC<AdminConcursosProps> = ({ state, updateState }) => {
+const AdminConcursos: React.FC<AdminConcursosProps> = ({ state, updateState, onRefresh }) => {
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         nome: '', banca: '', orgao: '', salarioMaximo: '', totalVagas: '',
         estado: '', cidade: '', dataInscInicio: '', dataInscFim: '', dataProva: '',
@@ -56,56 +59,80 @@ const AdminConcursos: React.FC<AdminConcursosProps> = ({ state, updateState }) =
         setShowForm(true);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleDelete = async (id: string) => {
+
+        setLoading(true);
+        try {
+            await supabase.from('concursos').delete().eq('id', id);
+            onRefresh();
+        } catch (error) {
+            console.error('Error deleting:', error);
+            alert('Erro ao excluir');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const concursoData: Concurso = {
-            id: editingId || Math.random().toString(36).substr(2, 9),
+        setLoading(true);
+
+        const payload: any = {
             nome: formData.nome,
-            banca: formData.banca,
-            orgao: formData.orgao,
-            status: formData.status as StatusConcurso,
-            cidades: [formData.estado, formData.cidade].filter(Boolean),
-            salarioMaximo: formData.salarioMaximo,
-            totalVagas: parseInt(formData.totalVagas) || 0,
-            datas: {
-                inscricaoInicio: formData.dataInscInicio,
-                inscricaoFim: formData.dataInscFim,
-                prova: formData.dataProva
-            },
-            links: {
-                inscricoes: formData.linkInscricao,
-                editalPdf: formData.linkEdital,
-                apostilas: formData.linkApostila,
-                cursos: formData.linkCurso
-            },
-            imageUrl: formData.capaUrl,
-            subCoverUrl: formData.subCapaUrl,
-            observacoes: formData.descricao
+            banca: formData.banca || '',
+            orgao: formData.orgao || '',
+            status: formData.status,
+            cidades: [formData.estado, formData.cidade].filter(Boolean), // Reverted to original logic for cities based on current formData
+            data_edital: null, // This field is not present in current formData, setting to null
+            data_prova: formData.dataProva || null,
+            data_inscricao_inicio: formData.dataInscInicio || null,
+            data_inscricao_fim: formData.dataInscFim || null,
+            link_oficial: formData.linkCurso || '', // Using linkCurso as official link
+            link_inscricoes: formData.linkInscricao || '',
+            link_edital: formData.linkEdital || '',
+            observacoes: formData.descricao || '',
+            image_url: formData.capaUrl || '',
+            sub_cover_url: formData.subCapaUrl || '',
+            total_vagas: parseInt(formData.totalVagas) || 0,
+            salario_maximo: formData.salarioMaximo || ''
         };
 
-        if (editingId) {
-            updateState({ concursos: state.concursos.map(c => c.id === editingId ? concursoData : c) });
-        } else {
-            updateState({ concursos: [...state.concursos, concursoData] });
+        try {
+            if (editingId) {
+                const { error } = await supabase.from('concursos').update(payload).eq('id', editingId);
+                if (error) throw error;
+            } else {
+                const { error } = await supabase.from('concursos').insert({
+                    id: Math.random().toString(36).substr(2, 9),
+                    ...payload
+                });
+                if (error) throw error;
+            }
+            onRefresh();
+            setShowForm(false);
+            setEditingId(null);
+            setFormData({
+                nome: '', banca: '', orgao: '', salarioMaximo: '', totalVagas: '',
+                estado: '', cidade: '', dataInscInicio: '', dataInscFim: '', dataProva: '',
+                linkInscricao: '', linkEdital: '', linkApostila: '', linkCurso: '',
+                capaUrl: '', subCapaUrl: '',
+                status: StatusConcurso.EditalPublicado,
+                descricao: ''
+            });
+        } catch (error) {
+            console.error('Error saving:', error);
+            alert('Erro ao salvar concurso');
+        } finally {
+            setLoading(false);
         }
-
-        setShowForm(false);
-        setEditingId(null);
-        setFormData({
-            nome: '', banca: '', orgao: '', salarioMaximo: '', totalVagas: '',
-            estado: '', cidade: '', dataInscInicio: '', dataInscFim: '', dataProva: '',
-            linkInscricao: '', linkEdital: '', linkApostila: '', linkCurso: '',
-            capaUrl: '', subCapaUrl: '',
-            status: StatusConcurso.EditalPublicado,
-            descricao: ''
-        });
     };
 
     return (
         <div className="max-w-5xl mx-auto space-y-6">
             <div className="flex justify-between items-center"><h3 className="text-xl font-bold text-slate-900">Gerenciar Concursos</h3><button onClick={() => { setShowForm(!showForm); setEditingId(null); }} className="bg-primary text-white px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">{showForm ? 'Fechar' : 'Novo Concurso'}</button></div>
             {showForm && (
-                <form onSubmit={handleSubmit} className="bg-white p-8 rounded-[40px] border border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-4 shadow-sm">
+                <form onSubmit={handleSubmit} className="bg-white p-8 rounded-[40px] border border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-4 shadow-sm relative">
+                    {loading && <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary rounded-full border-t-transparent"></div></div>}
                     <div className="col-span-2 md:col-span-4 border-b pb-4 mb-2 flex justify-between items-center">
                         <h4 className="text-xs font-black uppercase text-slate-400">{editingId ? 'Editando Concurso' : 'Informações Básicas'}</h4>
                     </div>
@@ -183,8 +210,8 @@ const AdminConcursos: React.FC<AdminConcursosProps> = ({ state, updateState }) =
                         </div>
                     </div>
 
-                    <button className="col-span-2 md:col-span-4 bg-primary text-white p-4 rounded-2xl font-black uppercase text-xs shadow-lg mt-4 active:scale-95 transition-all">
-                        {editingId ? 'Atualizar Concurso' : 'Salvar Concurso Completo'}
+                    <button className="col-span-2 md:col-span-4 bg-primary text-white p-4 rounded-2xl font-black uppercase text-xs shadow-lg mt-4 active:scale-95 transition-all" disabled={loading}>
+                        {loading ? 'Salvando...' : (editingId ? 'Atualizar Concurso' : 'Salvar Concurso Completo')}
                     </button>
                 </form>
             )}
@@ -202,7 +229,7 @@ const AdminConcursos: React.FC<AdminConcursosProps> = ({ state, updateState }) =
                         </div>
                         <div className="flex gap-2">
                             <button onClick={() => handleEdit(c)} className="text-slate-200 hover:text-primary transition-colors p-2"><span className="material-symbols-outlined">edit</span></button>
-                            <button onClick={() => updateState({ concursos: state.concursos.filter(con => con.id !== c.id) })} className="text-slate-200 hover:text-red-500 transition-colors p-2"><span className="material-symbols-outlined">delete</span></button>
+                            <button onClick={() => handleDelete(c.id)} className="text-slate-200 hover:text-red-500 transition-colors p-2"><span className="material-symbols-outlined">delete</span></button>
                         </div>
                     </div>
                 ))}

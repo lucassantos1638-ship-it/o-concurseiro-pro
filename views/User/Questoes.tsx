@@ -61,7 +61,7 @@ const UserQuestoes: React.FC<UserQuestoesProps> = ({ state, onStart }) => {
         const options = getFilterOptions(selectedMateria.id);
 
         return (
-            <div className="h-full flex flex-col p-6 md:p-10 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="h-auto min-h-full flex flex-col p-4 md:p-10 animate-in fade-in slide-in-from-right-4 duration-300 pb-32 overflow-y-auto">
                 <button
                     onClick={() => setSelectedMateria(null)}
                     className="self-start flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold mb-6 transition-colors"

@@ -7,24 +7,27 @@ import AdminMaterias from './AdminMaterias';
 import AdminQuestoes from './AdminQuestoes';
 import AdminImport from './AdminImport';
 import AdminWebhooks from './AdminWebhooks';
+import AdminBackup from './AdminBackup';
 
 interface AdminLayoutProps {
   state: AppState;
   updateState: (newState: Partial<AppState>) => void;
   onExitAdmin: () => void;
+  onRefresh: () => void;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ state, updateState, onExitAdmin }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ state, updateState, onExitAdmin, onRefresh }) => {
   const [currentTab, setCurrentTab] = useState('concursos');
 
   const renderAdminContent = () => {
     switch (currentTab) {
-      case 'concursos': return <AdminConcursos state={state} updateState={updateState} />;
-      case 'cargos': return <AdminCargos state={state} updateState={updateState} />;
-      case 'materias': return <AdminMaterias state={state} updateState={updateState} />;
-      case 'questoes': return <AdminQuestoes state={state} updateState={updateState} />;
+      case 'concursos': return <AdminConcursos state={state} updateState={updateState} onRefresh={onRefresh} />;
+      case 'cargos': return <AdminCargos state={state} updateState={updateState} onRefresh={onRefresh} />;
+      case 'materias': return <AdminMaterias state={state} updateState={updateState} onRefresh={onRefresh} />;
+      case 'questoes': return <AdminQuestoes state={state} updateState={updateState} onRefresh={onRefresh} />;
       case 'importar': return <AdminImport state={state} updateState={updateState} />;
       case 'webhooks': return <AdminWebhooks />;
+      case 'backup': return <AdminBackup />;
       default: return null;
     }
   };
@@ -38,7 +41,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ state, updateState, onExitAdm
             Painel Gestor
           </h2>
           <nav className="flex gap-2">
-            {['concursos', 'cargos', 'materias', 'questoes', 'importar', 'webhooks'].map((tab) => (
+            {['concursos', 'cargos', 'materias', 'questoes', 'importar', 'webhooks', 'backup'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setCurrentTab(tab)}

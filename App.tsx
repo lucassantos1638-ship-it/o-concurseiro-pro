@@ -22,8 +22,11 @@ import ChatPanel from './components/ChatPanel';
 import { useUserData } from './hooks/useUserData';
 import { useRanking } from './hooks/useRanking';
 
+import { useCoreData } from './hooks/useCoreData';
+
 const App: React.FC = () => {
-  const [state, setState] = useState<AppState>(INITIAL_STATE);
+  // Estado inicial vazio, será preenchido pelo hook useCoreData
+  const [state, setState] = useState<AppState>({ ...INITIAL_STATE, concursos: [], cargos: [], materias: [], questoes: [] });
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -81,6 +84,7 @@ const App: React.FC = () => {
 
   /* Hooks de Dados (Sincronizados com Supabase) */
   const { profile, progress, myCargosIds, loading: loadingData, updateProfile, updateMyCargos, updateProgress } = useUserData(session);
+  const { concursos, cargos, materias, questoes, loading: loadingCore, refreshData } = useCoreData();
   const { ranking } = useRanking();
 
   // Sincronizar dados do Hook com o AppState Local
@@ -90,9 +94,14 @@ const App: React.FC = () => {
       userProfile: profile,
       userProgress: progress,
       myCargosIds: myCargosIds,
-      ranking: ranking
+      ranking: ranking,
+      // Core Data
+      concursos: concursos,
+      cargos: cargos,
+      materias: materias,
+      questoes: questoes
     }));
-  }, [profile, progress, myCargosIds, ranking]);
+  }, [profile, progress, myCargosIds, ranking, concursos, cargos, materias, questoes]);
 
   const handleUpdateState = (newState: Partial<AppState>) => {
     // Interceptar atualizações para persistir no banco
@@ -113,6 +122,7 @@ const App: React.FC = () => {
           state={state}
           updateState={handleUpdateState}
           onExitAdmin={() => setIsAdmin(false)}
+          onRefresh={refreshData}
         />
       );
     }

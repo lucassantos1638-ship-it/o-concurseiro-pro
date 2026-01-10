@@ -194,7 +194,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          className="flex w-full overflow-x-auto gap-5 pb-6 snap-x hide-scrollbar -mx-2 px-2 cursor-pointer active:cursor-grabbing touch-pan-x"
+          className="flex w-full overflow-x-auto gap-5 pb-6 snap-x no-scrollbar -mx-2 px-2 cursor-pointer active:cursor-grabbing touch-pan-x"
           style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
         >
           {concursos.map((concurso) => (

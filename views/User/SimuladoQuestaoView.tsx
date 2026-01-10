@@ -42,7 +42,7 @@ const SimuladoQuestaoView: React.FC<SimuladoQuestaoViewProps> = ({ state, cargoI
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<string, { choice: string, confirmed: boolean }>>({});
   const [isConfirmed, setIsConfirmed] = useState(false);
-  const [showText, setShowText] = useState(false);
+  const [showText, setShowText] = useState(true);
 
   const currentQuestao = questoesAleatorias[currentIndex];
 

@@ -88,7 +88,7 @@ const DraggableChatButton: React.FC<DraggableChatButtonProps> = ({ onClick, isOp
                 touchAction: 'none', // Importante para não rolar a tela enquanto arrasta
                 transform: 'translate(0, 0)', // Hardware acceleration
             }}
-            className="z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-2xl shadow-primary/40 hover:scale-110 active:scale-95 transition-transform group cursor-move"
+            className="z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-2xl shadow-primary/40 hover:scale-110 active:scale-95 transition-transform group cursor-pointer"
         >
             <span className="material-symbols-outlined text-2xl pointer-events-none select-none">
                 {isOpen ? 'close' : 'forum'}

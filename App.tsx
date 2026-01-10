@@ -23,6 +23,7 @@ import { useUserData } from './hooks/useUserData';
 import { useRanking } from './hooks/useRanking';
 
 import { useCoreData } from './hooks/useCoreData';
+import DraggableChatButton from './components/DraggableChatButton';
 
 const App: React.FC = () => {
   // Estado inicial vazio, será preenchido pelo hook useCoreData
@@ -331,34 +332,18 @@ const App: React.FC = () => {
 
         {!isAdmin && (
           <>
-            <button
+            <DraggableChatButton
+              isOpen={isChatOpen}
               onClick={() => {
                 const newOpenState = !isChatOpen;
                 setIsChatOpen(newOpenState);
                 if (newOpenState) {
-                  setUnreadCount(0); // Zera contador ao abrir
+                  setUnreadCount(0);
                 }
               }}
-              className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-2xl shadow-primary/40 hover:scale-110 active:scale-95 transition-all group"
-            >
-              <span className="material-symbols-outlined text-2xl">
-                {isChatOpen ? 'close' : 'forum'}
-              </span>
-
-              {/* Notifier Badge */}
-              {!isChatOpen && unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold border-2 border-white animate-pulse">
-                  {unreadCount}
-                </span>
-              )}
-
-              {/* PRO Badge */}
-              {state.userProfile.plan === 'free' && (
-                <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded-md font-black uppercase tracking-widest shadow-sm border-2 border-white whitespace-nowrap">
-                  PRO
-                </span>
-              )}
-            </button>
+              unreadCount={unreadCount}
+              isPro={state.userProfile.plan !== 'free'}
+            />
 
             {/* ChatPanel renderizado sempre para manter conexão socket ativa, apenas oculto visualmente */}
             <div className={!isChatOpen ? 'hidden' : ''}>

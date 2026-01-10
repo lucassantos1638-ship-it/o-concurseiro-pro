@@ -164,23 +164,23 @@ const UserQuestoes: React.FC<UserQuestoesProps> = ({ state, onStart }) => {
             </div>
 
             {filteredMaterias.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {filteredMaterias.map(materia => {
                         const questaoCount = state.questoes.filter(q => q.materiaId === materia.id).length;
                         return (
                             <button
                                 key={materia.id}
                                 onClick={() => handleMateriaClick(materia)}
-                                className="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all text-left flex flex-col gap-4"
+                                className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-primary/50 hover:shadow-md hover:shadow-primary/5 transition-all text-left flex items-center gap-4"
                             >
-                                <div className="h-12 w-12 rounded-xl bg-slate-50 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
-                                    <span className="material-symbols-outlined text-slate-400 group-hover:text-primary text-2xl transition-colors">
+                                <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-50 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                    <span className="material-symbols-outlined text-slate-400 group-hover:text-primary text-xl transition-colors">
                                         menu_book
                                     </span>
                                 </div>
-                                <div>
-                                    <h3 className="font-bold text-slate-800 text-lg leading-tight group-hover:text-primary transition-colors">{materia.nome}</h3>
-                                    <span className="text-xs font-medium text-slate-400 mt-1 block">{questaoCount} questões disponíveis</span>
+                                <div className="min-w-0">
+                                    <h3 className="font-bold text-slate-800 text-sm leading-tight group-hover:text-primary transition-colors truncate">{materia.nome}</h3>
+                                    <span className="text-[10px] font-bold text-slate-400 mt-0.5 block uppercase tracking-wide">{questaoCount} questões</span>
                                 </div>
                             </button>
                         );

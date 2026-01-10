@@ -48,6 +48,14 @@ const UserQuestoes: React.FC<UserQuestoesProps> = ({ state, onStart }) => {
         onStart(selectedMateria.id, filters);
     };
 
+    // Filtro de pesquisa
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Filtrar matérias
+    const filteredMaterias = state.materias.filter(materia =>
+        materia.nome.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     // Se uma matéria estiver selecionada, mostra o modal/tela de configuração
     if (selectedMateria) {
         const options = getFilterOptions(selectedMateria.id);
@@ -137,33 +145,56 @@ const UserQuestoes: React.FC<UserQuestoesProps> = ({ state, onStart }) => {
     // Lista de Matérias
     return (
         <div className="p-6 md:p-10 space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-2">Banco de Questões</h2>
-                <p className="text-slate-500 font-medium">Selecione uma matéria para praticar questões aleatoriamente.</p>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div>
+                    <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-2">Banco de Questões</h2>
+                    <p className="text-slate-500 font-medium">Selecione uma matéria para praticar questões aleatoriamente.</p>
+                </div>
+
+                <div className="w-full md:w-72 relative">
+                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                    <input
+                        type="text"
+                        placeholder="Buscar matéria..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all placeholder:font-medium placeholder:text-slate-400"
+                    />
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {state.materias.map(materia => {
-                    const questaoCount = state.questoes.filter(q => q.materiaId === materia.id).length;
-                    return (
-                        <button
-                            key={materia.id}
-                            onClick={() => handleMateriaClick(materia)}
-                            className="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all text-left flex flex-col gap-4"
-                        >
-                            <div className="h-12 w-12 rounded-xl bg-slate-50 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
-                                <span className="material-symbols-outlined text-slate-400 group-hover:text-primary text-2xl transition-colors">
-                                    menu_book
-                                </span>
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-slate-800 text-lg leading-tight group-hover:text-primary transition-colors">{materia.nome}</h3>
-                                <span className="text-xs font-medium text-slate-400 mt-1 block">{questaoCount} questões disponíveis</span>
-                            </div>
-                        </button>
-                    );
-                })}
-            </div>
+            {filteredMaterias.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {filteredMaterias.map(materia => {
+                        const questaoCount = state.questoes.filter(q => q.materiaId === materia.id).length;
+                        return (
+                            <button
+                                key={materia.id}
+                                onClick={() => handleMateriaClick(materia)}
+                                className="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all text-left flex flex-col gap-4"
+                            >
+                                <div className="h-12 w-12 rounded-xl bg-slate-50 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                    <span className="material-symbols-outlined text-slate-400 group-hover:text-primary text-2xl transition-colors">
+                                        menu_book
+                                    </span>
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-slate-800 text-lg leading-tight group-hover:text-primary transition-colors">{materia.nome}</h3>
+                                    <span className="text-xs font-medium text-slate-400 mt-1 block">{questaoCount} questões disponíveis</span>
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className="text-center py-20 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+                    <div className="h-16 w-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span className="material-symbols-outlined text-slate-400 text-3xl">search_off</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800 mb-1">Nenhuma matéria encontrada</h3>
+                    <p className="text-slate-500 text-sm">Tente buscar por outro termo.</p>
+                </div>
+            )}
         </div>
     );
 };

@@ -5,9 +5,10 @@ interface ProGuardProps {
     state: AppState;
     children: React.ReactNode;
     title?: string;
+    onClose?: () => void;
 }
 
-const ProGuard: React.FC<ProGuardProps> = ({ state, children, title = 'Funcionalidade PRO' }) => {
+const ProGuard: React.FC<ProGuardProps> = ({ state, children, title = 'Funcionalidade PRO', onClose }) => {
     const isPro = state.userProfile.plan === 'pro';
 
     if (isPro) {
@@ -23,7 +24,16 @@ const ProGuard: React.FC<ProGuardProps> = ({ state, children, title = 'Funcional
 
             {/* Overlay de Bloqueio */}
             <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/60 p-6 text-center backdrop-blur-sm">
-                <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md border border-slate-100 flex flex-col items-center">
+                <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md border border-slate-100 flex flex-col items-center relative">
+                    {onClose && (
+                        <button
+                            onClick={onClose}
+                            className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-colors"
+                        >
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+                    )}
+
                     <div className="h-16 w-16 mb-6 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
                         <span className="material-symbols-outlined text-3xl text-white">workspace_premium</span>
                     </div>

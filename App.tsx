@@ -239,7 +239,7 @@ const App: React.FC = () => {
         );
       case 'questoes':
         return (
-          <ProGuard state={state} title="Banco de Questões">
+          <ProGuard state={state} title="Banco de Questões" onClose={() => setActiveTab('dashboard')}>
             <UserQuestoes
               state={state}
               onStart={(materiaId, filters) => {

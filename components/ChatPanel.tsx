@@ -51,7 +51,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ state, onClose, setActiveTab, onU
   return (
     <div className="fixed inset-x-4 bottom-24 z-[60] flex flex-col bg-white sm:inset-auto sm:bottom-24 sm:right-6 h-[85vh] max-h-[85vh] sm:h-[580px] w-auto sm:w-[370px] rounded-[32px] border border-slate-200 shadow-2xl animate-in slide-in-from-bottom-5 fade-in duration-300 overflow-hidden">
 
-      <ProGuard state={state} title="Chat da Comunidade">
+      <ProGuard state={state} title="Chat da Comunidade" onClose={onClose}>
         {/* Header - Com Seletor de Sala */}
         <div className="flex items-center justify-between bg-white px-5 py-4 border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-2">

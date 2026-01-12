@@ -132,7 +132,8 @@ export const INITIAL_STATE: AppState = {
     name: 'Estudante Focado',
     state: 'São Paulo',
     city: 'São Paulo',
-    profilePicture: 'https://picsum.photos/seed/user-pro/100/100'
+    profilePicture: 'https://picsum.photos/seed/user-pro/100/100',
+    plan: 'free'
   },
   myCargosIds: ['ca1']
 };

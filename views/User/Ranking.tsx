@@ -58,6 +58,53 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
 
   }, [state.ranking, state.userProfile, state.userProgress, selectedCargoId, state.myCargosIds]);
 
+  const currentCargo = useMemo(() => {
+    return state.cargos.find(c => c.id === selectedCargoId);
+  }, [state.cargos, selectedCargoId]);
+
+  const rankingFeedback = useMemo(() => {
+    if (!currentCargo || fullRanking.length === 0) return null;
+
+    const myIndex = fullRanking.findIndex(r => r.userName === state.userProfile.name);
+    if (myIndex === -1) return null;
+
+    const myRank = myIndex + 1;
+    // Consideramos Vagas Totais (Ampla + PCD) para fins de simplificação, ou apenas Ampla?
+    // O usuário mencionou "4 vagas". Vamos somar Ampla + PCD se o usuário for PCD, ou usar vagasAmplas?
+    // Vamos usar o totalVagas do cargo ou vagasAmplas.
+    // Dado que é um simulado geral, vamos usar vagasAmplas como "Vagas Imediatas" principais para feedback geral,
+    // mas se o usuário for PCD, idealmente compararia com vagas PCD. 
+    // Como a lista é unificada, vamos simplificar usando vagasAmplas + vagasPCD como "Vagas Imediatas Totais".
+    const vagasImediatas = currentCargo.vagasAmplas + currentCargo.vagasPcd;
+    const cadastroReserva = currentCargo.vagasCR;
+
+    if (myRank <= vagasImediatas) {
+      return {
+        type: 'success',
+        style: 'bg-emerald-50 border-emerald-100 text-emerald-800',
+        icon: 'trophy',
+        title: `Parabéns! Você está em ${myRank}º lugar!`,
+        message: `Você está dentro das ${vagasImediatas} vagas imediatas. Continue fazendo os simulados e mantenha sua posição de aprovação!`
+      };
+    } else if (myRank <= vagasImediatas + cadastroReserva) {
+      return {
+        type: 'warning',
+        style: 'bg-amber-50 border-amber-100 text-amber-800',
+        icon: 'trending_up',
+        title: `Você está no Cadastro de Reserva (Posição ${myRank}º)`,
+        message: `Faltam poucas posições para entrar nas vagas diretas. Você está na zona do CR (Total de ${cadastroReserva} vagas CR). Estude mais e melhore sua posição!`
+      };
+    } else {
+      return {
+        type: 'info',
+        style: 'bg-slate-50 border-slate-200 text-slate-600',
+        icon: 'school',
+        title: `Sua posição atual é ${myRank}º`,
+        message: `Você está fora das vagas e do CR no momento. Lembre-se: este é um simulado com candidatos reais. Intensifique os estudos para subir no ranking!`
+      };
+    }
+  }, [currentCargo, fullRanking, state.userProfile.name]);
+
   return (
     <div className="p-4 md:p-10 max-w-6xl mx-auto flex flex-col gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 antialiased pb-24">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -93,7 +140,39 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
             </select>
           </div>
         </div>
+
+        {currentCargo && (
+          <div className="animate-in fade-in slide-in-from-top-2 duration-500">
+            <div className="flex flex-wrap gap-3 mb-6">
+              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vagas Imediatas</span>
+                <span className="text-2xl font-black text-slate-800">{currentCargo.vagasAmplas + currentCargo.vagasPcd}</span>
+              </div>
+              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cadastro Reserva</span>
+                <span className="text-2xl font-black text-slate-600">{currentCargo.vagasCR}</span>
+              </div>
+              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Concorrência</span>
+                <span className="text-2xl font-black text-slate-400">{fullRanking.length}</span>
+              </div>
+            </div>
+
+            {rankingFeedback && (
+              <div className={`rounded-xl border p-4 flex gap-4 ${rankingFeedback.style}`}>
+                <div className="shrink-0">
+                  <span className="material-symbols-outlined text-3xl">{rankingFeedback.icon}</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg leading-tight mb-1">{rankingFeedback.title}</h3>
+                  <p className="text-sm font-medium opacity-90 leading-relaxed">{rankingFeedback.message}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
 
       {/* Visualização Mobile (Cards conforme screenshot) */}
       <div className="flex flex-col gap-4 md:hidden">
@@ -206,13 +285,15 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
         </div>
       </div>
 
-      {fullRanking.length === 0 && (
-        <div className="p-20 text-center flex flex-col items-center">
-          <span className="material-symbols-outlined text-5xl text-slate-100 mb-4">leaderboard</span>
-          <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">Nenhum dado para este filtro</p>
-        </div>
-      )}
-    </div>
+      {
+        fullRanking.length === 0 && (
+          <div className="p-20 text-center flex flex-col items-center">
+            <span className="material-symbols-outlined text-5xl text-slate-100 mb-4">leaderboard</span>
+            <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">Nenhum dado para este filtro</p>
+          </div>
+        )
+      }
+    </div >
   );
 };
 

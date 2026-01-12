@@ -173,28 +173,38 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
 
         {currentCargo && (
           <div className="animate-in fade-in slide-in-from-top-2 duration-500">
-            <div className="flex flex-wrap gap-3 mb-6">
-              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vagas Ampla</span>
                 <span className="text-2xl font-black text-slate-800">{currentCargo.vagasAmplas}</span>
               </div>
-              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vagas PCD</span>
                 <span className="text-2xl font-black text-blue-600">{currentCargo.vagasPcd}</span>
               </div>
-              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cadastro Reserva</span>
                 <span className="text-2xl font-black text-slate-600">{currentCargo.vagasCR}</span>
               </div>
-              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center relative overflow-hidden">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total de Candidatos</span>
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center relative overflow-visible group/info">
+                <div className="flex items-center gap-1 mb-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total de Candidatos</span>
+                  <span className="material-symbols-outlined text-[14px] text-slate-300 cursor-help hover:text-primary transition-colors">info</span>
+
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 bg-slate-800 text-white text-[10px] font-medium p-3 rounded-xl shadow-xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all z-50 pointer-events-none">
+                    Total de candidatos cadastrados para este cargo no O Concurseiro Pro, e não no concurso oficial.
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                  </div>
+                </div>
+
                 {state.userProfile.plan === 'pro' ? (
                   <span className="text-2xl font-black text-slate-400">{fullRanking.length}</span>
                 ) : (
-                  <div className="flex flex-col items-center justify-center mt-1">
-                    <span className="text-2xl font-black text-slate-400 blur-sm select-none">{fullRanking.length}</span>
+                  <div className="relative flex flex-col items-center justify-center w-full">
+                    <span className="text-2xl font-black text-slate-400 blur-sm select-none opacity-50">{fullRanking.length}</span>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] px-2 py-1 rounded-md font-black uppercase tracking-widest shadow-sm">PRO</span>
+                      <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest shadow-sm transform scale-90">PRO</span>
                     </div>
                   </div>
                 )}

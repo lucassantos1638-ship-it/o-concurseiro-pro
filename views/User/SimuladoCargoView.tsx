@@ -149,7 +149,7 @@ const SimuladoCargoView: React.FC<SimuladoCargoViewProps> = ({ state, cargoId, o
           >
             Começar Simulado
             {state.userProfile.plan !== 'pro' ? (
-              <span className="material-symbols-outlined text-base text-amber-300">lock</span>
+              <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded-md font-black uppercase tracking-widest shadow-sm">PRO</span>
             ) : (
               <span className="material-symbols-outlined text-base">rocket_launch</span>
             )}

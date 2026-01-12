@@ -284,7 +284,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
       {/* Seção de Ranking - Dashboard */}
       <section>
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-slate-900 tracking-tight">Líderes do Grupo {userMainCargoId ? ` - ${cargos.find(c => c.id === userMainCargoId)?.nome}` : ''}</h3>
+          <h3 className="text-xl font-bold text-slate-900 tracking-tight">Líderes do Grupo{userMainCargoId && cargos.find(c => c.id === userMainCargoId) ? ` - ${cargos.find(c => c.id === userMainCargoId)?.nome}` : ''}</h3>
           <button onClick={() => setActiveTab('ranking')} className="text-xs font-bold text-primary hover:underline">Ver ranking completo</button>
         </div>
         <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">

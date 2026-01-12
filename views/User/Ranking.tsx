@@ -175,8 +175,12 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
           <div className="animate-in fade-in slide-in-from-top-2 duration-500">
             <div className="flex flex-wrap gap-3 mb-6">
               <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vagas Imediatas</span>
-                <span className="text-2xl font-black text-slate-800">{currentCargo.vagasAmplas + currentCargo.vagasPcd}</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vagas Ampla</span>
+                <span className="text-2xl font-black text-slate-800">{currentCargo.vagasAmplas}</span>
+              </div>
+              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vagas PCD</span>
+                <span className="text-2xl font-black text-blue-600">{currentCargo.vagasPcd}</span>
               </div>
               <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cadastro Reserva</span>
@@ -187,160 +191,160 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
                 <span className="text-2xl font-black text-slate-400">{fullRanking.length}</span>
               </div>
             </div>
+          </div>
 
             {rankingFeedback && (
-              <div className={`rounded-xl border p-4 flex gap-4 ${rankingFeedback.style}`}>
-                <div className="shrink-0">
-                  <span className="material-symbols-outlined text-3xl">{rankingFeedback.icon}</span>
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg leading-tight mb-1">{rankingFeedback.title}</h3>
-                  <p className="text-sm font-medium opacity-90 leading-relaxed">{rankingFeedback.message}</p>
-                </div>
-              </div>
-            )}
+          <div className={`rounded-xl border p-4 flex gap-4 ${rankingFeedback.style}`}>
+            <div className="shrink-0">
+              <span className="material-symbols-outlined text-3xl">{rankingFeedback.icon}</span>
+            </div>
+            <div>
+              <h3 className="font-bold text-lg leading-tight mb-1">{rankingFeedback.title}</h3>
+              <p className="text-sm font-medium opacity-90 leading-relaxed">{rankingFeedback.message}</p>
+            </div>
           </div>
         )}
       </div>
+        )}
+    </div>
 
 
-      {/* Visualização Mobile (Cards conforme screenshot) */}
-      <div className="flex flex-col gap-4 md:hidden">
-        {fullRanking.map((entry, index) => {
-          const isMe = entry.userName === state.userProfile.name;
-          return (
-            <div
-              key={entry.id}
-              className={`p-4 rounded-[20px] bg-white border border-slate-100 shadow-sm flex items-center gap-4 transition-all ${isMe ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-            >
-              <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-amber-100 text-amber-600' :
-                index === 1 ? 'bg-slate-100 text-slate-600' :
-                  index === 2 ? 'bg-orange-50 text-orange-600' :
-                    'bg-slate-50 text-slate-400'
-                }`}>
-                {index + 1}
-              </div>
-
-              <div className="h-10 w-10 shrink-0 rounded-full overflow-hidden border border-slate-100 shadow-sm">
-                <img src={entry.avatar} className="w-full h-full object-cover" alt="" />
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-800 text-[13px] truncate">{entry.userName}</span>
-                  {isMe && <span className="bg-primary text-white text-[7px] font-bold px-1.5 py-0.5 rounded uppercase">VOCÊ</span>}
-                </div>
-
-                <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight truncate">
-                    {entry.city.toUpperCase()} - {entry.state.toUpperCase()}
-                  </p>
-                  {entry.age && (
-                    <>
-                      <span className="text-[8px] text-slate-300">•</span>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">{entry.age} ANOS</span>
-                    </>
-                  )}
-                  {entry.isPcd && (
-                    <span className="bg-blue-100 text-blue-700 text-[8px] font-bold px-1.5 rounded ml-1">PCD</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="text-right">
-                <p className="text-sm font-black text-primary leading-none">{entry.accuracyRate}%</p>
-                <p className="text-[8px] font-bold text-slate-300 uppercase mt-1">{entry.questionsResolved} QS</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Visualização Desktop (Tabela) */}
-      <div className="hidden md:block bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50/50">
-                <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-24 text-center">Posição</th>
-                <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estudante</th>
-                <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Localização</th>
-                <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Localização</th>
-                <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Idade</th>
-                <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Questões</th>
-                <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Aproveitamento</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {fullRanking.map((entry, index) => {
-                const isMe = entry.userName === state.userProfile.name;
-                const isTop3 = index < 3;
-
-                return (
-                  <tr key={entry.id} className={`hover:bg-slate-50/50 transition-colors group ${isMe ? 'bg-primary/[0.03]' : ''}`}>
-                    <td className="p-6 text-center">
-                      <div className="flex items-center justify-center">
-                        <span className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs border ${index === 0 ? 'bg-amber-100 text-amber-600 border-amber-200' :
-                          index === 1 ? 'bg-slate-100 text-slate-600 border-slate-200' :
-                            index === 2 ? 'bg-orange-50 text-orange-600 border-orange-100' :
-                              'bg-white text-slate-400 border-slate-100'
-                          }`}>
-                          {index + 1}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-white shadow-sm shrink-0">
-                          <img src={entry.avatar} className="h-full w-full object-cover" alt="" />
-                        </div>
-                        <div>
-                          <p className={`font-bold text-sm ${isMe ? 'text-primary' : 'text-slate-800'}`}>
-                            {entry.userName} {isMe && <span className="ml-2 text-[8px] font-bold bg-primary text-white px-1.5 py-0.5 rounded-full uppercase tracking-tighter">VOCÊ</span>}
-                          </p>
-                          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">
-                            {state.cargos.find(c => c.id === entry.cargoId)?.nome || 'Concurseiro'}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-6">
-                      <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-slate-600">{entry.city}</span>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">{entry.state}</span>
-                      </div>
-                    </td>
-                    <td className="p-6 text-center">
-                      <span className="text-xs font-semibold text-slate-600">{entry.age ? `${entry.age} Anos` : '-'}</span>
-                      {entry.isPcd && <div className="mt-1"><span className="bg-blue-100 text-blue-700 text-[9px] font-bold px-1.5 py-0.5 rounded">PCD</span></div>}
-                    </td>
-                    <td className="p-6 text-center">
-                      <span className="text-xs font-bold text-slate-500">{entry.questionsResolved.toLocaleString()}</span>
-                    </td>
-                    <td className="p-6 text-right">
-                      <div className="flex flex-col items-end">
-                        <span className={`text-sm font-black ${isTop3 ? 'text-primary' : 'text-slate-700'}`}>{entry.accuracyRate}%</span>
-                        <div className="w-24 h-1 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
-                          <div className={`h-full ${isMe ? 'bg-primary animate-pulse' : 'bg-primary/60'}`} style={{ width: `${entry.accuracyRate}%` }}></div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {
-        fullRanking.length === 0 && (
-          <div className="p-20 text-center flex flex-col items-center">
-            <span className="material-symbols-outlined text-5xl text-slate-100 mb-4">leaderboard</span>
-            <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">Nenhum dado para este filtro</p>
+      {/* Visualização Mobile (Cards conforme screenshot) */ }
+  <div className="flex flex-col gap-4 md:hidden">
+    {fullRanking.map((entry, index) => {
+      const isMe = entry.userName === state.userProfile.name;
+      return (
+        <div
+          key={entry.id}
+          className={`p-4 rounded-[20px] bg-white border border-slate-100 shadow-sm flex items-center gap-4 transition-all ${isMe ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+        >
+          <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-amber-100 text-amber-600' :
+            index === 1 ? 'bg-slate-100 text-slate-600' :
+              index === 2 ? 'bg-orange-50 text-orange-600' :
+                'bg-slate-50 text-slate-400'
+            }`}>
+            {index + 1}
           </div>
-        )
-      }
+
+          <div className="h-10 w-10 shrink-0 rounded-full overflow-hidden border border-slate-100 shadow-sm">
+            <img src={entry.avatar} className="w-full h-full object-cover" alt="" />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-slate-800 text-[13px] truncate">{entry.userName}</span>
+              {isMe && <span className="bg-primary text-white text-[7px] font-bold px-1.5 py-0.5 rounded uppercase">VOCÊ</span>}
+            </div>
+
+            <div className="flex items-center gap-2 mt-0.5">
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight truncate">
+                {entry.city.toUpperCase()} - {entry.state.toUpperCase()}
+              </p>
+              {entry.age && (
+                <>
+                  <span className="text-[8px] text-slate-300">•</span>
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">{entry.age} ANOS</span>
+                </>
+              )}
+              {entry.isPcd && (
+                <span className="bg-blue-100 text-blue-700 text-[8px] font-bold px-1.5 rounded ml-1">PCD</span>
+              )}
+            </div>
+          </div>
+
+          <div className="text-right">
+            <p className="text-sm font-black text-primary leading-none">{entry.accuracyRate}%</p>
+            <p className="text-[8px] font-bold text-slate-300 uppercase mt-1">{entry.questionsResolved} QS</p>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  {/* Visualização Desktop (Tabela) */ }
+  <div className="hidden md:block bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+    <div className="overflow-x-auto">
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-slate-50/50">
+            <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-24 text-center">Posição</th>
+            <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estudante</th>
+            <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Localização</th>
+            <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Idade</th>
+            <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Questões</th>
+            <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Aproveitamento</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-50">
+          {fullRanking.map((entry, index) => {
+            const isMe = entry.userName === state.userProfile.name;
+            const isTop3 = index < 3;
+
+            return (
+              <tr key={entry.id} className={`hover:bg-slate-50/50 transition-colors group ${isMe ? 'bg-primary/[0.03]' : ''}`}>
+                <td className="p-6 text-center">
+                  <div className="flex items-center justify-center">
+                    <span className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs border ${index === 0 ? 'bg-amber-100 text-amber-600 border-amber-200' :
+                      index === 1 ? 'bg-slate-100 text-slate-600 border-slate-200' :
+                        index === 2 ? 'bg-orange-50 text-orange-600 border-orange-100' :
+                          'bg-white text-slate-400 border-slate-100'
+                      }`}>
+                      {index + 1}
+                    </span>
+                  </div>
+                </td>
+                <td className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-white shadow-sm shrink-0">
+                      <img src={entry.avatar} className="h-full w-full object-cover" alt="" />
+                    </div>
+                    <div>
+                      <p className={`font-bold text-sm ${isMe ? 'text-primary' : 'text-slate-800'}`}>
+                        {entry.userName} {isMe && <span className="ml-2 text-[8px] font-bold bg-primary text-white px-1.5 py-0.5 rounded-full uppercase tracking-tighter">VOCÊ</span>}
+                      </p>
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">
+                        {state.cargos.find(c => c.id === entry.cargoId)?.nome || 'Concurseiro'}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className="p-6">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-semibold text-slate-600">{entry.city}</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">{entry.state}</span>
+                  </div>
+                </td>
+                <td className="p-6 text-center">
+                  <span className="text-xs font-semibold text-slate-600">{entry.age ? `${entry.age} Anos` : '-'}</span>
+                  {entry.isPcd && <div className="mt-1"><span className="bg-blue-100 text-blue-700 text-[9px] font-bold px-1.5 py-0.5 rounded">PCD</span></div>}
+                </td>
+                <td className="p-6 text-center">
+                  <span className="text-xs font-bold text-slate-500">{entry.questionsResolved.toLocaleString()}</span>
+                </td>
+                <td className="p-6 text-right">
+                  <div className="flex flex-col items-end">
+                    <span className={`text-sm font-black ${isTop3 ? 'text-primary' : 'text-slate-700'}`}>{entry.accuracyRate}%</span>
+                    <div className="w-24 h-1 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+                      <div className={`h-full ${isMe ? 'bg-primary animate-pulse' : 'bg-primary/60'}`} style={{ width: `${entry.accuracyRate}%` }}></div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {
+    fullRanking.length === 0 && (
+      <div className="p-20 text-center flex flex-col items-center">
+        <span className="material-symbols-outlined text-5xl text-slate-100 mb-4">leaderboard</span>
+        <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">Nenhum dado para este filtro</p>
+      </div>
+    )
+  }
     </div >
   );
 };

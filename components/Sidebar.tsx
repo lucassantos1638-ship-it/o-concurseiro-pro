@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onAdminClick
                 <span className="text-sm font-bold tracking-tight flex-1">{item.label}</span>
 
                 {/* PRO Badge */}
-                {(item.id === 'meus-cargos' || item.id === 'questoes') && plan === 'free' && (
+                {item.id === 'questoes' && plan === 'free' && (
                   <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded-md font-black uppercase tracking-widest shadow-sm">
                     PRO
                   </span>

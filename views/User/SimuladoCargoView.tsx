@@ -98,8 +98,8 @@ const SimuladoCargoView: React.FC<SimuladoCargoViewProps> = ({ state, cargoId, o
                   key={config.materiaId}
                   onClick={() => setSelectedMateriaId(config.materiaId)}
                   className={`group relative flex items-center justify-between p-5 rounded-[20px] border transition-all text-left min-h-[80px] ${isSelected
-                      ? 'bg-primary/5 border-primary shadow-md'
-                      : 'bg-white border-slate-100 hover:border-slate-200 shadow-sm'
+                    ? 'bg-primary/5 border-primary shadow-md'
+                    : 'bg-white border-slate-100 hover:border-slate-200 shadow-sm'
                     }`}
                 >
                   <div className="flex items-center gap-5 flex-1">
@@ -143,12 +143,16 @@ const SimuladoCargoView: React.FC<SimuladoCargoViewProps> = ({ state, cargoId, o
             disabled={!selectedMateriaId}
             onClick={handleStart}
             className={`pointer-events-auto w-full max-w-[300px] py-4 rounded-full font-black uppercase text-[11px] tracking-[0.2em] shadow-[0_20px_50px_rgba(19,91,236,0.3)] transition-all flex items-center justify-center gap-3 ${selectedMateriaId
-                ? 'bg-primary text-white hover:scale-[1.05] active:scale-95'
-                : 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
+              ? 'bg-primary text-white hover:scale-[1.05] active:scale-95'
+              : 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
               }`}
           >
             Começar Simulado
-            <span className="material-symbols-outlined text-base">rocket_launch</span>
+            {state.userProfile.plan !== 'pro' ? (
+              <span className="material-symbols-outlined text-base text-amber-300">lock</span>
+            ) : (
+              <span className="material-symbols-outlined text-base">rocket_launch</span>
+            )}
           </button>
         </div>
       </div>

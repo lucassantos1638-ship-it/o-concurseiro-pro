@@ -186,9 +186,18 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cadastro Reserva</span>
                 <span className="text-2xl font-black text-slate-600">{currentCargo.vagasCR}</span>
               </div>
-              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Concorrência</span>
-                <span className="text-2xl font-black text-slate-400">{fullRanking.length}</span>
+              <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total de Candidatos</span>
+                {state.userProfile.plan === 'pro' ? (
+                  <span className="text-2xl font-black text-slate-400">{fullRanking.length}</span>
+                ) : (
+                  <div className="flex flex-col items-center justify-center mt-1">
+                    <span className="text-2xl font-black text-slate-400 blur-sm select-none">{fullRanking.length}</span>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] px-2 py-1 rounded-md font-black uppercase tracking-widest shadow-sm">PRO</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

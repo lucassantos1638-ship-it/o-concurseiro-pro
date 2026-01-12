@@ -18,6 +18,8 @@ export interface UserProfile {
   city: string;
   profilePicture: string;
   plan: 'free' | 'pro';
+  age?: number;
+  isPcd?: boolean;
 }
 
 export interface Concurso {

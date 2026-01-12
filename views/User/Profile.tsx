@@ -111,6 +111,29 @@ const UserProfileView: React.FC<ProfileProps> = ({ state, updateProfile }) => {
                   required
                 />
               </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-slate-700 tracking-tight">Idade</label>
+                <input
+                  type="number"
+                  value={localProfile.age || ''}
+                  onChange={(e) => setLocalProfile(prev => ({ ...prev, age: parseInt(e.target.value) || undefined }))}
+                  className="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 focus:ring-primary focus:border-primary transition-all font-medium text-slate-900"
+                  placeholder="Sua idade"
+                  min="0"
+                  max="120"
+                />
+              </div>
+              <div className="flex flex-col gap-2 justify-end pb-3">
+                <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
+                  <input
+                    type="checkbox"
+                    checked={localProfile.isPcd || false}
+                    onChange={(e) => setLocalProfile(prev => ({ ...prev, isPcd: e.target.checked }))}
+                    className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+                  />
+                  <span className="font-bold text-slate-700">Sou Pessoa com Deficiência (PCD)</span>
+                </label>
+              </div>
             </div>
 
             <div className="flex items-center justify-between mt-4">

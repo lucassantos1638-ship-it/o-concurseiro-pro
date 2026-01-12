@@ -12,7 +12,9 @@ export function useUserData(session: Session | null) {
         state: '',
         city: '',
         profilePicture: '',
-        plan: 'free'
+        plan: 'free',
+        age: undefined,
+        isPcd: false
     });
 
     const [progress, setProgress] = useState<UserProgress>({
@@ -33,7 +35,9 @@ export function useUserData(session: Session | null) {
                 state: '',
                 city: '',
                 profilePicture: '',
-                plan: 'free'
+                plan: 'free',
+                age: undefined,
+                isPcd: false
             });
             setProgress({
                 hoursStudied: 0,
@@ -76,7 +80,9 @@ export function useUserData(session: Session | null) {
                             city: defaultProfile.city,
                             state: defaultProfile.state,
                             profilePicture: defaultProfile.profile_picture,
-                            plan: 'free'
+                            plan: 'free',
+                            age: undefined,
+                            isPcd: false
                         });
                         setMyCargosIds([]);
                     }
@@ -86,7 +92,9 @@ export function useUserData(session: Session | null) {
                         city: profileData.city || '',
                         state: profileData.state || '',
                         profilePicture: profileData.profile_picture || '',
-                        plan: (profileData.plan as 'free' | 'pro') || 'free'
+                        plan: (profileData.plan as 'free' | 'pro') || 'free',
+                        age: profileData.age,
+                        isPcd: profileData.is_pcd
                     });
                     setMyCargosIds(profileData.my_cargos_ids || []);
                 }
@@ -149,7 +157,9 @@ export function useUserData(session: Session | null) {
                             name: newData.name,
                             city: newData.city,
                             state: newData.state,
-                            profilePicture: newData.profile_picture
+                            profilePicture: newData.profile_picture,
+                            age: newData.age,
+                            isPcd: newData.is_pcd
                         }));
                         setMyCargosIds(newData.my_cargos_ids || []);
                     }
@@ -170,7 +180,9 @@ export function useUserData(session: Session | null) {
             name: newProfile.name,
             city: newProfile.city,
             state: newProfile.state,
-            profile_picture: newProfile.profilePicture
+            profile_picture: newProfile.profilePicture,
+            age: newProfile.age,
+            is_pcd: newProfile.isPcd
         }).eq('id', session.user.id);
     };
 

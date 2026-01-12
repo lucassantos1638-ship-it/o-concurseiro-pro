@@ -80,6 +80,8 @@ export interface RankingEntry {
   questionsResolved: number;
   cargoId: string;
   avatar: string;
+  age?: number;
+  isPcd?: boolean;
 }
 
 export interface Materia {

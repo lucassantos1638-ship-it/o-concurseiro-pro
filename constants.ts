@@ -70,12 +70,12 @@ export const INITIAL_STATE: AppState = {
     }
   ],
   ranking: [
-    { id: 'r1', userName: 'Ricardo Silva', city: 'São Paulo', state: 'SP', accuracyRate: 98.5, questionsResolved: 1240, cargoId: 'ca1', avatar: 'https://i.pravatar.cc/100?u=r1' },
-    { id: 'r2', userName: 'Ana Oliveira', city: 'Rio de Janeiro', state: 'RJ', accuracyRate: 97.2, questionsResolved: 1100, cargoId: 'ca1', avatar: 'https://i.pravatar.cc/100?u=r2' },
-    { id: 'r3', userName: 'Marcos Souza', city: 'Curitiba', state: 'PR', accuracyRate: 95.8, questionsResolved: 980, cargoId: 'ca1', avatar: 'https://i.pravatar.cc/100?u=r3' },
-    { id: 'r4', userName: 'Carla Dias', city: 'Belo Horizonte', state: 'MG', accuracyRate: 94.1, questionsResolved: 850, cargoId: 'ca1', avatar: 'https://i.pravatar.cc/100?u=r4' },
-    { id: 'r5', userName: 'Joaquim Neto', city: 'Recife', state: 'PE', accuracyRate: 99.2, questionsResolved: 1500, cargoId: 'ca2', avatar: 'https://i.pravatar.cc/100?u=r5' },
-    { id: 'r6', userName: 'Patrícia Lima', city: 'Porto Alegre', state: 'RS', accuracyRate: 96.5, questionsResolved: 1020, cargoId: 'ca2', avatar: 'https://i.pravatar.cc/100?u=r6' },
+    { id: 'r1', userName: 'Ricardo Silva', city: 'São Paulo', state: 'SP', accuracyRate: 98.5, questionsResolved: 1240, cargoId: 'ca1', avatar: 'https://i.pravatar.cc/100?u=r1', age: 28, isPcd: false },
+    { id: 'r2', userName: 'Ana Oliveira', city: 'Rio de Janeiro', state: 'RJ', accuracyRate: 97.2, questionsResolved: 1100, cargoId: 'ca1', avatar: 'https://i.pravatar.cc/100?u=r2', age: 32, isPcd: true },
+    { id: 'r3', userName: 'Marcos Souza', city: 'Curitiba', state: 'PR', accuracyRate: 95.8, questionsResolved: 980, cargoId: 'ca1', avatar: 'https://i.pravatar.cc/100?u=r3', age: 25, isPcd: false },
+    { id: 'r4', userName: 'Carla Dias', city: 'Belo Horizonte', state: 'MG', accuracyRate: 94.1, questionsResolved: 850, cargoId: 'ca1', avatar: 'https://i.pravatar.cc/100?u=r4', age: 29, isPcd: false },
+    { id: 'r5', userName: 'Joaquim Neto', city: 'Recife', state: 'PE', accuracyRate: 99.2, questionsResolved: 1500, cargoId: 'ca2', avatar: 'https://i.pravatar.cc/100?u=r5', age: 35, isPcd: true },
+    { id: 'r6', userName: 'Patrícia Lima', city: 'Porto Alegre', state: 'RS', accuracyRate: 96.5, questionsResolved: 1020, cargoId: 'ca2', avatar: 'https://i.pravatar.cc/100?u=r6', age: 27, isPcd: false },
   ],
   materias: [
     { id: 'm1', nome: 'Língua Portuguesa', categoria: 'Linguagens', nivelCompativel: Nivel.Superior },

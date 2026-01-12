@@ -32,7 +32,9 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
       accuracyRate: state.userProgress.accuracyRate,
       questionsResolved: state.userProgress.questionsResolved,
       cargoId: selectedCargoId !== 'all' ? selectedCargoId : (state.myCargosIds[0] || 'none'),
-      avatar: state.userProfile.profilePicture
+      avatar: state.userProfile.profilePicture,
+      age: state.userProfile.age,
+      isPcd: state.userProfile.isPcd
     };
 
     // Combinamos o ranking existente com o usuário
@@ -65,45 +67,73 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
   const rankingFeedback = useMemo(() => {
     if (!currentCargo || fullRanking.length === 0) return null;
 
-    const myIndex = fullRanking.findIndex(r => r.userName === state.userProfile.name);
-    if (myIndex === -1) return null;
+    // Filtro PCD se o usuário for PCD
+    const isUserPcd = state.userProfile.isPcd;
 
-    const myRank = myIndex + 1;
-    // Consideramos Vagas Totais (Ampla + PCD) para fins de simplificação, ou apenas Ampla?
-    // O usuário mencionou "4 vagas". Vamos somar Ampla + PCD se o usuário for PCD, ou usar vagasAmplas?
-    // Vamos usar o totalVagas do cargo ou vagasAmplas.
-    // Dado que é um simulado geral, vamos usar vagasAmplas como "Vagas Imediatas" principais para feedback geral,
-    // mas se o usuário for PCD, idealmente compararia com vagas PCD. 
-    // Como a lista é unificada, vamos simplificar usando vagasAmplas + vagasPCD como "Vagas Imediatas Totais".
-    const vagasImediatas = currentCargo.vagasAmplas + currentCargo.vagasPcd;
-    const cadastroReserva = currentCargo.vagasCR;
+    // Se usuário for PCD, o ranking de comparação deve ser apenas entre PCDs?
+    // O usuário disse: "ranking dele vai aparecer do mesmo jeito" (aparece na lista geral),
+    // MAS "vagas dele vai ser de acordo do numero de vagas para pcd".
+    // Então para o FEEDBACK, calculamos a posição dele relativo apenas aos outros PCDs do ranking?
+    // OU calculamos a posição dele no geral e comparamos com vagas PCD?
+    // Geralmente concursos têm listas separadas. Se ele compete na lista PCD, a posição dele é X na lista PCD.
+    // Vamos filtrar a lista para achar a "Posição PCD" dele.
 
-    if (myRank <= vagasImediatas) {
+    let effectiveRank: number;
+    let vagasDisponiveis: number;
+    let labelVagas: string;
+
+    if (isUserPcd) {
+      const pcdRanking = fullRanking.filter(r => r.isPcd);
+      const myPcdIndex = pcdRanking.findIndex(r => r.userName === state.userProfile.name);
+
+      if (myPcdIndex === -1) return null; // Deveria estar na lista
+
+      effectiveRank = myPcdIndex + 1;
+      vagasDisponiveis = currentCargo.vagasPcd;
+      labelVagas = 'vagas PCD';
+    } else {
+      const myIndex = fullRanking.findIndex(r => r.userName === state.userProfile.name);
+      if (myIndex === -1) return null;
+
+      effectiveRank = myIndex + 1;
+      vagasDisponiveis = currentCargo.vagasAmplas;
+      labelVagas = 'vagas imediatas';
+    }
+
+    // CR é compartilhado ou específico? Vamos assumir que CR é geral ou proporcional. 
+    // Para simplificar, usamos o CR total do cargo para o aviso de "zona de espera", 
+    // mas comparando com rank efetivo + CR pode ser impreciso se CR for separado.
+    // Vamos usar a lógica simples: Rank <= Vagas = Aprovado.
+
+    const cadastroReserva = currentCargo.vagasCR; // CR Geral
+
+    if (effectiveRank <= vagasDisponiveis) {
       return {
         type: 'success',
         style: 'bg-emerald-50 border-emerald-100 text-emerald-800',
         icon: 'trophy',
-        title: `Parabéns! Você está em ${myRank}º lugar!`,
-        message: `Você está dentro das ${vagasImediatas} vagas imediatas. Continue fazendo os simulados e mantenha sua posição de aprovação!`
+        title: `Parabéns! Você está em ${effectiveRank}º lugar ${isUserPcd ? '(Lista PCD)' : ''}!`,
+        message: `Você está dentro das ${vagasDisponiveis} ${labelVagas}. Continue fazendo os simulados e mantenha sua posição de aprovação!`
       };
-    } else if (myRank <= vagasImediatas + cadastroReserva) {
+    } else if (effectiveRank <= vagasDisponiveis + cadastroReserva) {
+      // Nota: Essa lógica de CR está simplificada
       return {
         type: 'warning',
         style: 'bg-amber-50 border-amber-100 text-amber-800',
         icon: 'trending_up',
-        title: `Você está no Cadastro de Reserva (Posição ${myRank}º)`,
-        message: `Faltam poucas posições para entrar nas vagas diretas. Você está na zona do CR (Total de ${cadastroReserva} vagas CR). Estude mais e melhore sua posição!`
+        title: `Você está no Cadastro de Reserva (Posição ${effectiveRank}º ${isUserPcd ? 'PCD' : ''})`,
+        message: `Faltam poucas posições para entrar nas vagas diretas. Você está na zona do CR. Estude mais e melhore sua posição!`
       };
     } else {
       return {
         type: 'info',
         style: 'bg-slate-50 border-slate-200 text-slate-600',
         icon: 'school',
-        title: `Sua posição atual é ${myRank}º`,
+        title: `Sua posição atual é ${effectiveRank}º ${isUserPcd ? '(Lista PCD)' : ''}`,
         message: `Você está fora das vagas e do CR no momento. Lembre-se: este é um simulado com candidatos reais. Intensifique os estudos para subir no ranking!`
       };
     }
-  }, [currentCargo, fullRanking, state.userProfile.name]);
+  }, [currentCargo, fullRanking, state.userProfile.name, state.userProfile.isPcd]);
 
   return (
     <div className="p-4 md:p-10 max-w-6xl mx-auto flex flex-col gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 antialiased pb-24">
@@ -200,9 +230,21 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
                   <span className="font-bold text-slate-800 text-[13px] truncate">{entry.userName}</span>
                   {isMe && <span className="bg-primary text-white text-[7px] font-bold px-1.5 py-0.5 rounded uppercase">VOCÊ</span>}
                 </div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight truncate">
-                  {entry.city.toUpperCase()} - {entry.state.toUpperCase()}
-                </p>
+
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight truncate">
+                    {entry.city.toUpperCase()} - {entry.state.toUpperCase()}
+                  </p>
+                  {entry.age && (
+                    <>
+                      <span className="text-[8px] text-slate-300">•</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">{entry.age} ANOS</span>
+                    </>
+                  )}
+                  {entry.isPcd && (
+                    <span className="bg-blue-100 text-blue-700 text-[8px] font-bold px-1.5 rounded ml-1">PCD</span>
+                  )}
+                </div>
               </div>
 
               <div className="text-right">
@@ -223,6 +265,8 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
                 <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-24 text-center">Posição</th>
                 <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estudante</th>
                 <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Localização</th>
+                <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Localização</th>
+                <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Idade</th>
                 <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Questões</th>
                 <th className="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Aproveitamento</th>
               </tr>
@@ -265,6 +309,10 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
                         <span className="text-xs font-semibold text-slate-600">{entry.city}</span>
                         <span className="text-[10px] font-bold text-slate-400 uppercase">{entry.state}</span>
                       </div>
+                    </td>
+                    <td className="p-6 text-center">
+                      <span className="text-xs font-semibold text-slate-600">{entry.age ? `${entry.age} Anos` : '-'}</span>
+                      {entry.isPcd && <div className="mt-1"><span className="bg-blue-100 text-blue-700 text-[9px] font-bold px-1.5 py-0.5 rounded">PCD</span></div>}
                     </td>
                     <td className="p-6 text-center">
                       <span className="text-xs font-bold text-slate-500">{entry.questionsResolved.toLocaleString()}</span>

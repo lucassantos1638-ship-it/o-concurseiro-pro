@@ -235,9 +235,7 @@ const App: React.FC = () => {
         />;
       case 'meus-cargos':
         return (
-          <ProGuard state={state} title="Meus Cargos">
-            <UserCargos state={state} onSelectCargo={(id) => setSimuladoCargoId(id)} />
-          </ProGuard>
+          <UserCargos state={state} onSelectCargo={(id) => setSimuladoCargoId(id)} />
         );
       case 'questoes':
         return (

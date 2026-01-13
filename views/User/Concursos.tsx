@@ -37,31 +37,40 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
     [state.concursos, selectedConcursoId]
   );
 
+  import { getConcursoStatus } from '../../utils/concursoStatus';
+
+  // ... (inside component)
+
+  // Use the new helper function
   const getDynamicStatus = (concurso: Concurso) => {
-    const today = new Date();
-    const startStr = concurso.datas.inscricaoInicio;
-    const endStr = concurso.datas.inscricaoFim;
-    if (!startStr) return concurso.status;
-    const start = new Date(startStr);
-    const end = endStr ? new Date(endStr) : null;
-    if (today < start) return "Previsto";
-    if (end && today > end) return "Encerrado";
-    if (today >= start) {
-      if (end) {
-        const diffTime = end.getTime() - today.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        if (diffDays <= 5 && diffDays >= 0) return "Últimos Dias";
-      }
-      return "Inscrições Abertas";
+    // Add logic for 'Últimos Dias' check on top of the base status if needed
+    // Or just return the base status.
+    // The user wants strict logic. Let's see if we should keep "Last Days".
+    // User said: "Inscrições Abertas" -> "Em Andamento". Did not specify "Last Days".
+    // But "Last Days" is a nice UI feature.
+    // Let's rely on getConcursoStatus but override locally for "Últimos Dias" if strictly within typical "Open" period.
+
+    const status = getConcursoStatus(concurso);
+    if (status === 'Inscrições Abertas' && concurso.datas.inscricaoFim) {
+      const today = new Date();
+      const end = new Date(concurso.datas.inscricaoFim + 'T12:00:00');
+      const diffTime = end.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays <= 5 && diffDays >= 0) return "Últimos Dias";
     }
-    return concurso.status;
+    return status;
   };
 
   const getStatusTag = (status: string) => {
     const baseClasses = "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold border transition-all";
-    if (status === "Inscrições Abertas" || status === "Edital Publicado") return <span className={`${baseClasses} bg-emerald-50 text-emerald-600 border-emerald-100/50`}><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> {status}</span>;
-    if (status === "Previsto") return <span className={`${baseClasses} bg-amber-50 text-amber-600 border-amber-100/50`}><span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Previsto</span>;
+    if (status === "Inscrições Abertas" || status === "Edital Aberto") return <span className={`${baseClasses} bg-emerald-50 text-emerald-600 border-emerald-100/50`}><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> {status}</span>;
+    if (status === "Em Andamento") return <span className={`${baseClasses} bg-blue-50 text-blue-600 border-blue-100/50`}><span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span> {status}</span>;
+    if (status === "Provas Realizadas") return <span className={`${baseClasses} bg-slate-100 text-slate-600 border-slate-200`}><span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span> {status}</span>;
     if (status === "Últimos Dias") return <span className={`${baseClasses} bg-red-50 text-red-600 border-red-100/50 animate-pulse`}><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> Últimos Dias</span>;
+
+    // Fallback/Legacy
+    if (status === "Previsto") return <span className={`${baseClasses} bg-amber-50 text-amber-600 border-amber-100/50`}><span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Previsto</span>;
+
     return <span className={`${baseClasses} bg-slate-100 text-slate-600 border-slate-200`}>{status}</span>;
   };
 

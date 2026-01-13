@@ -197,21 +197,28 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
           className="flex w-full overflow-x-auto gap-5 pb-6 snap-x no-scrollbar -mx-2 px-2 cursor-pointer active:cursor-grabbing touch-pan-x"
           style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
         >
-          {concursos.map((concurso) => (
-            <div
-              key={concurso.id}
-              onClick={() => !hasMoved && setActiveTab('concursos')}
-              className="relative min-w-[340px] md:min-w-[500px] h-[280px] rounded-[32px] overflow-hidden snap-start group shadow-xl transition-all hover:shadow-primary/20 shrink-0"
-            >
-              <img src={concurso.imageUrl} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none" alt="" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none"></div>
-              <div className="absolute bottom-0 left-0 p-8 flex flex-col gap-3 pointer-events-none">
-                <span className={`inline-flex w-fit items-center rounded-full px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-lg ${concurso.status === 'Edital Publicado' ? 'bg-primary' : 'bg-amber-500'}`}>{concurso.status}</span>
-                <h3 className="text-2xl font-bold text-white leading-tight uppercase group-hover:translate-x-1 transition-transform tracking-tight">{concurso.nome}</h3>
-                <p className="text-sm font-medium text-slate-300 line-clamp-2 max-w-[90%] opacity-90">{concurso.observacoes}</p>
+          import {getConcursoStatus} from '../../utils/concursoStatus';
+
+          // ... (inside component)
+          {concursos.map((concurso) => {
+            const status = getConcursoStatus(concurso);
+            const isHighlighted = status === 'Inscrições Abertas' || status === 'Edital Aberto';
+            return (
+              <div
+                key={concurso.id}
+                onClick={() => !hasMoved && setActiveTab('concursos')}
+                className="relative min-w-[340px] md:min-w-[500px] h-[280px] rounded-[32px] overflow-hidden snap-start group shadow-xl transition-all hover:shadow-primary/20 shrink-0"
+              >
+                <img src={concurso.imageUrl} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none" alt="" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 p-8 flex flex-col gap-3 pointer-events-none">
+                  <span className={`inline-flex w-fit items-center rounded-full px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-lg ${isHighlighted ? 'bg-primary' : 'bg-amber-500'}`}>{status}</span>
+                  <h3 className="text-2xl font-bold text-white leading-tight uppercase group-hover:translate-x-1 transition-transform tracking-tight">{concurso.nome}</h3>
+                  <p className="text-sm font-medium text-slate-300 line-clamp-2 max-w-[90%] opacity-90">{concurso.observacoes}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </section>
 

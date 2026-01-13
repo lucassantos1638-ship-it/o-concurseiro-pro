@@ -212,6 +212,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 p-8 flex flex-col gap-3 pointer-events-none">
                   <span className={`inline-flex w-fit items-center rounded-full px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-lg ${isHighlighted ? 'bg-primary' : 'bg-amber-500'}`}>{status}</span>
+                  <span className="text-[10px] text-white/50">{concurso.datas.inscricaoInicio}</span>
                   <h3 className="text-2xl font-bold text-white leading-tight uppercase group-hover:translate-x-1 transition-transform tracking-tight">{concurso.nome}</h3>
                   <p className="text-sm font-medium text-slate-300 line-clamp-2 max-w-[90%] opacity-90">{concurso.observacoes}</p>
                 </div>

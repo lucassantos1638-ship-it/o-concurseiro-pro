@@ -13,12 +13,25 @@ export const getConcursoStatus = (concurso: Concurso): string => {
     // Supabase usually returns YYYY-MM-DD for date columns.
     const parseDate = (dateStr?: string) => {
         if (!dateStr) return null;
+
+        // Handle DD/MM/YYYY (common in Brazil)
+        if (dateStr.includes('/')) {
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                // assume dd/mm/yyyy
+                const d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T12:00:00`);
+                d.setHours(0, 0, 0, 0);
+                return isNaN(d.getTime()) ? null : d;
+            }
+        }
+
         // Check if looks like ISO
         if (dateStr.includes('T')) {
             const d = new Date(dateStr);
             d.setHours(0, 0, 0, 0);
             return isNaN(d.getTime()) ? null : d;
         }
+
         // Assume YYYY-MM-DD
         const d = new Date(dateStr + 'T12:00:00');
         d.setHours(0, 0, 0, 0);

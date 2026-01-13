@@ -275,7 +275,9 @@ const AdminCargos: React.FC<AdminCargosProps> = ({ state, updateState, onRefresh
                                 <div key={idx} className="flex items-center justify-between p-3 bg-white border rounded-xl hover:shadow-sm transition-all">
                                     <div className="flex items-center gap-4">
                                         <span className="w-6 h-6 bg-slate-100 text-[10px] flex items-center justify-center rounded-full font-black text-slate-400">{idx + 1}</span>
-                                        <span className="font-bold text-slate-800 text-sm">{mat?.nome}</span>
+                                        <span className={`font-bold text-sm ${mat ? 'text-slate-800' : 'text-red-400'}`}>
+                                            {mat ? mat.nome : `Indisponível (ID: ${item.materiaId.substring(0, 8)}...)`}
+                                        </span>
                                     </div>
                                     <div className="flex items-center gap-6">
                                         <span className="text-[10px] font-black text-primary uppercase">Peso {item.peso}</span>

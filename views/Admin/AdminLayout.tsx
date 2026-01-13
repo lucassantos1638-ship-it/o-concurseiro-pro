@@ -29,7 +29,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ state, updateState, onExitAdm
       case 'questoes': return <AdminQuestoes state={state} updateState={updateState} onRefresh={onRefresh} />;
       case 'importar': return <AdminImport state={state} updateState={updateState} />;
       case 'importar-pdf': return <AdminImportPdf state={state} updateState={updateState} />;
-      case 'materias-import': return <AdminImportMaterias state={state} updateState={updateState} />;
+      case 'materias-import': return <AdminImportMaterias state={state} updateState={updateState} onRefresh={onRefresh} />;
       case 'webhooks': return <AdminWebhooks />;
       case 'backup': return <AdminBackup />;
       default: return null;

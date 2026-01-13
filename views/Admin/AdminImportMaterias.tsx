@@ -136,7 +136,7 @@ const AdminImportMaterias: React.FC<AdminImportMateriasProps> = ({ state, update
 
                     const newMat = {
                         nome: item.materiaName,
-                        nivelCompativel: item.nivel as Nivel,
+                        nivel_compativel: item.nivel as Nivel, // Fixed: snake_case
                         categoria: 'Geral'
                     };
 
@@ -154,7 +154,7 @@ const AdminImportMaterias: React.FC<AdminImportMateriasProps> = ({ state, update
                     const freshMateria: Materia = {
                         id: insertedMat.id,
                         nome: insertedMat.nome,
-                        nivelCompativel: insertedMat.nivel_compativel as Nivel, // Map snake_case from DB
+                        nivelCompativel: insertedMat.nivel_compativel as Nivel,
                         categoria: insertedMat.categoria,
                         descricao: insertedMat.descricao
                     };
@@ -168,41 +168,46 @@ const AdminImportMaterias: React.FC<AdminImportMateriasProps> = ({ state, update
                     // We do exactly that.
                 }
 
-                // 3. Link to Cargo
-                // Find cargo in our updated array (tho we are not modifying array structure just objects deep down)
+                // 3. Link to Cargo using 'cargos_materias' table
                 const cargoIndex = updatedCargos.findIndex(c => c.id === item.cargoId);
                 if (cargoIndex === -1) continue;
 
-                const currentConfig = updatedCargos[cargoIndex].materiasConfig || [];
+                // Upsert into join table
+                // We assume (cargo_id, materia_id) is unique/PK
+                const linkageData = {
+                    cargo_id: item.cargoId,
+                    materia_id: materia!.id,
+                    peso: item.peso,
+                    quantidade_questoes: item.qtd
+                };
 
-                // Remove existing config for this materia if exists to overwrite
-                const newConfig = currentConfig.filter(cfg => cfg.materiaId !== materia!.id);
+                const { error: errLink } = await supabase
+                    .from('cargos_materias')
+                    .upsert(linkageData, { onConflict: 'cargo_id,materia_id' }); // Explicitly stating conflict content
 
-                newConfig.push({
-                    materiaId: materia.id,
-                    quantidadeQuestoes: item.qtd,
-                    peso: item.peso
-                });
-
-                // Update in Supabase
-                const { error: errUpdate } = await supabase
-                    .from('cargos')
-                    .update({ materias_config: newConfig }) // Note: DB column is usually snake_case, check types or codebase conventions. 
-                    // types.ts says `materiasConfig`, but supabase usually maps to `materias_config` in JSONB or similar.
-                    // Looking at previous `AdminImport.tsx` or similar might reveal DB schema.
-                    // In `types.ts`, `metricsConfig` is inside `Cargo` interface.
-                    // Assuming the table column is `materias_config` or similar. Let's infer standard mapping.
-                    // If the project uses a typed client or raw mapping?
-                    // I'll assume `materias_config` based on standard convention for this project.
-                    .eq('id', item.cargoId);
-
-                if (errUpdate) {
-                    addLog(`❌ Erro ao atualizar cargo ${updatedCargos[cargoIndex].nome}: ${errUpdate.message}`);
+                if (errLink) {
+                    addLog(`❌ Erro ao vincular ${item.materiaName} em ${updatedCargos[cargoIndex].nome}: ${errLink.message}`);
                 } else {
-                    updatedCargos[cargoIndex] = {
-                        ...updatedCargos[cargoIndex],
-                        materiasConfig: newConfig
+                    // Update local state for immediate feedback/preview if needed, 
+                    // though syncing 'cargos_materias' perfectly to 'cargos.materiasConfig' locally is complex without full re-fetch.
+                    // We will try to update the local object just so the UI doesn't look stale if we navigate away/back, 
+                    // but strictly speaking, a refresh is better.
+
+                    const currentConfig = updatedCargos[cargoIndex].materiasConfig || [];
+                    const existingIdx = currentConfig.findIndex(cfg => cfg.materiaId === materia!.id);
+
+                    const newEntry = {
+                        materiaId: materia!.id,
+                        quantidadeQuestoes: item.qtd,
+                        peso: item.peso
                     };
+
+                    if (existingIdx >= 0) {
+                        updatedCargos[cargoIndex].materiasConfig[existingIdx] = newEntry;
+                    } else {
+                        updatedCargos[cargoIndex].materiasConfig.push(newEntry);
+                    }
+
                     processedCount++;
                 }
             }

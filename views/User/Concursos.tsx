@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { AppState, Concurso, Cargo, Nivel } from '../../types';
+import { getConcursoStatus } from '../../utils/concursoStatus';
 
 interface ConcursosProps {
   state: AppState;
@@ -37,9 +38,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
     [state.concursos, selectedConcursoId]
   );
 
-  import { getConcursoStatus } from '../../utils/concursoStatus';
 
-  // ... (inside component)
 
   // Use the new helper function
   const getDynamicStatus = (concurso: Concurso) => {

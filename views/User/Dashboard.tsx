@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { AppState } from '../../types';
+import { getConcursoStatus } from '../../utils/concursoStatus';
 
 interface DashboardProps {
   state: AppState;
@@ -197,9 +198,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
           className="flex w-full overflow-x-auto gap-5 pb-6 snap-x no-scrollbar -mx-2 px-2 cursor-pointer active:cursor-grabbing touch-pan-x"
           style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
         >
-          import {getConcursoStatus} from '../../utils/concursoStatus';
 
-          // ... (inside component)
           {concursos.map((concurso) => {
             const status = getConcursoStatus(concurso);
             const isHighlighted = status === 'Inscrições Abertas' || status === 'Edital Aberto';

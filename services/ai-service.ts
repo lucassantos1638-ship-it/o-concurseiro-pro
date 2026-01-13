@@ -34,7 +34,7 @@ const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 export const parseEditalWithAI = async (text: string): Promise<ParsedConcurso> => {
     if (!API_KEY) {
-        throw new Error('Chave da API Gemini não configurada.');
+        throw new Error('Chave da API Gemini não configurada. Verifique as variáveis de ambiente (VITE_GEMINI_API_KEY).');
     }
 
     const prompt = `
@@ -93,33 +93,54 @@ export const parseEditalWithAI = async (text: string): Promise<ParsedConcurso> =
     // Note: Gemini 1.5 Flash supports large context, but we slice just in case of massive files to avoid transport errors if not needed. 100k chars is usually enough for key parts of edital if text is well extracted.
     // For better results in production, we might want to be smarter about slicing (beginning + middle where tables usually are), but this is a good start.
 
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: prompt }]
-                }],
-                generationConfig: {
-                    responseMimeType: "application/json"
+    // List of models to try in order
+    const models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
+    let lastError: any;
+
+    for (const model of models) {
+        try {
+            console.log(`Tentando modelo: ${model}...`);
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: prompt }]
+                    }],
+                    generationConfig: {
+                        responseMimeType: "application/json"
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                // If 404, try next model. If 403/400, might be key issue.
+                const status = response.status;
+                if (status === 404) {
+                    console.warn(`Modelo ${model} não encontrado (404). Tentando próximo.`);
+                    lastError = `Modelo ${model} indisponível: ${errText}`;
+                    continue;
                 }
-            })
-        });
+                throw new Error(`Erro na API Gemini (${model}): ${status} - ${errText}`);
+            }
 
-        if (!response.ok) {
-            const err = await response.text();
-            throw new Error(`Erro na API Gemini: ${err}`);
+            const data = await response.json();
+            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+                throw new Error(`Resposta inválida do Gemini (${model}): ${JSON.stringify(data)}`);
+            }
+
+            const jsonText = data.candidates[0].content.parts[0].text;
+            return JSON.parse(jsonText);
+
+        } catch (error) {
+            console.error(`Falha no modelo ${model}:`, error);
+            lastError = error;
+            // Continue to next model if available
         }
-
-        const data = await response.json();
-        const jsonText = data.candidates[0].content.parts[0].text;
-
-        return JSON.parse(jsonText);
-    } catch (error) {
-        console.error('Erro ao consultar Gemini:', error);
-        throw error;
     }
+
+    throw lastError || new Error('Falha ao processar com todos os modelos de IA.');
 };

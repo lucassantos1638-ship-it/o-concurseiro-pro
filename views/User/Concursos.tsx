@@ -251,7 +251,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                 <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
                   <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Local</span>
                   <p className="text-sm md:text-xl font-black text-slate-900 truncate" title={selectedConcurso.cidades.join(', ')}>
-                    {selectedConcurso.cidades.length > 1 ? 'Múltiplos' : (selectedConcurso.cidades[0] || 'Nacional')}
+                    {selectedConcurso.cidades.join(', ') || 'Nacional'}
                   </p>
                 </div>
               </div>
@@ -301,8 +301,8 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                           </td>
                           <td className="p-5">
                             <span className={`inline-block px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wide border ${cargo.nivel === 'Superior' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
-                                cargo.nivel === 'Médio' ? 'bg-teal-50 text-teal-600 border-teal-100' :
-                                  'bg-slate-50 text-slate-500 border-slate-100'
+                              cargo.nivel === 'Médio' ? 'bg-teal-50 text-teal-600 border-teal-100' :
+                                'bg-slate-50 text-slate-500 border-slate-100'
                               }`}>
                               {cargo.nivel}
                             </span>
@@ -334,8 +334,8 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                       <div className="flex justify-between items-start gap-3 mb-3">
                         <h4 className="font-bold text-slate-800 text-sm uppercase leading-tight">{cargo.nome}</h4>
                         <span className={`shrink-0 px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wide border ${cargo.nivel === 'Superior' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
-                            cargo.nivel === 'Médio' ? 'bg-teal-50 text-teal-600 border-teal-100' :
-                              'bg-slate-50 text-slate-500 border-slate-100'
+                          cargo.nivel === 'Médio' ? 'bg-teal-50 text-teal-600 border-teal-100' :
+                            'bg-slate-50 text-slate-500 border-slate-100'
                           }`}>
                           {cargo.nivel}
                         </span>
@@ -465,7 +465,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                       <div className="flex flex-col">
                         <span className="text-[9px] font-bold text-slate-400 uppercase">Local</span>
                         <span className="text-xs font-bold text-[#111827] mt-0.5 truncate" title={concurso.cidades.join(', ')}>
-                          {concurso.cidades.length > 1 ? 'Várias Cidades' : (concurso.cidades[0] || 'Nacional')}
+                          {concurso.cidades.join(', ') || 'Nacional'}
                         </span>
                       </div>
                       <div className="flex flex-col">

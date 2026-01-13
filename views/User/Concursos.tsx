@@ -37,10 +37,6 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
     state.concursos.find(c => c.id === selectedConcursoId),
     [state.concursos, selectedConcursoId]
   );
-
-
-
-  // Use the new helper function
   const getDynamicStatus = (concurso: Concurso) => {
     // Add logic for 'Últimos Dias' check on top of the base status if needed
     // Or just return the base status.

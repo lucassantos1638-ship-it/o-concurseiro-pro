@@ -280,50 +280,88 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
 
           <div className="bg-white rounded-[32px] border border-slate-100 overflow-hidden mb-12 shadow-sm">
             {cargosDoConcurso.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-slate-50/50">
-                    <tr>
-                      <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest pl-8">Cargo</th>
-                      <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Nível</th>
-                      <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Salário</th>
-                      <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Vagas</th>
-                      <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest pr-8"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {cargosDoConcurso.map(cargo => (
-                      <tr key={cargo.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors last:border-0 group">
-                        <td className="p-5 pl-8">
-                          <p className="font-bold text-slate-800 text-sm uppercase group-hover:text-primary transition-colors">{cargo.nome}</p>
-                        </td>
-                        <td className="p-5">
-                          <span className={`inline-block px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wide border ${cargo.nivel === 'Superior' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-slate-50/50">
+                      <tr>
+                        <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest pl-8">Cargo</th>
+                        <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Nível</th>
+                        <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Salário</th>
+                        <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Vagas</th>
+                        <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest pr-8"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cargosDoConcurso.map(cargo => (
+                        <tr key={cargo.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors last:border-0 group">
+                          <td className="p-5 pl-8">
+                            <p className="font-bold text-slate-800 text-sm uppercase group-hover:text-primary transition-colors">{cargo.nome}</p>
+                          </td>
+                          <td className="p-5">
+                            <span className={`inline-block px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wide border ${cargo.nivel === 'Superior' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                                cargo.nivel === 'Médio' ? 'bg-teal-50 text-teal-600 border-teal-100' :
+                                  'bg-slate-50 text-slate-500 border-slate-100'
+                              }`}>
+                              {cargo.nivel}
+                            </span>
+                          </td>
+                          <td className="p-5">
+                            <span className="font-black text-emerald-600 text-xs">{cargo.salario || 'A definir'}</span>
+                          </td>
+                          <td className="p-5 text-center">
+                            <span className="font-bold text-slate-700 text-xs">{cargo.totalVagas}</span>
+                          </td>
+                          <td className="p-5 pr-8 text-right">
+                            <button
+                              onClick={() => setViewingCargoId(cargo.id)}
+                              className="bg-slate-100 text-slate-500 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all hover:shadow-lg hover:shadow-primary/20"
+                            >
+                              Detalhes
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile List View */}
+                <div className="md:hidden">
+                  {cargosDoConcurso.map(cargo => (
+                    <div key={cargo.id} className="p-5 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                      <div className="flex justify-between items-start gap-3 mb-3">
+                        <h4 className="font-bold text-slate-800 text-sm uppercase leading-tight">{cargo.nome}</h4>
+                        <span className={`shrink-0 px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wide border ${cargo.nivel === 'Superior' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
                             cargo.nivel === 'Médio' ? 'bg-teal-50 text-teal-600 border-teal-100' :
                               'bg-slate-50 text-slate-500 border-slate-100'
-                            }`}>
-                            {cargo.nivel}
-                          </span>
-                        </td>
-                        <td className="p-5">
+                          }`}>
+                          {cargo.nivel}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <span className="text-[8px] font-black text-slate-400 uppercase block mb-0.5">Salário</span>
                           <span className="font-black text-emerald-600 text-xs">{cargo.salario || 'A definir'}</span>
-                        </td>
-                        <td className="p-5 text-center">
-                          <span className="font-bold text-slate-700 text-xs">{cargo.totalVagas}</span>
-                        </td>
-                        <td className="p-5 pr-8 text-right">
-                          <button
-                            onClick={() => setViewingCargoId(cargo.id)}
-                            className="bg-slate-100 text-slate-500 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all hover:shadow-lg hover:shadow-primary/20"
-                          >
-                            Detalhes
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                        </div>
+                        <div>
+                          <span className="text-[8px] font-black text-slate-400 uppercase block mb-0.5">Vagas</span>
+                          <span className="font-bold text-slate-700 text-xs">{cargo.totalVagas} vagas</span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => setViewingCargoId(cargo.id)}
+                        className="w-full bg-slate-100 text-slate-500 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all active:scale-95"
+                      >
+                        Ver Detalhes
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : (
               <div className="p-12 text-center border-dashed">
                 <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">Aguardando cadastro de cargos pelo gestor.</p>

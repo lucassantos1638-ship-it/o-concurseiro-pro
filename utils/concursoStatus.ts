@@ -9,34 +9,42 @@ export const getConcursoStatus = (concurso: Concurso): string => {
 
     if (!inscricaoInicio) return concurso.status;
 
-    // Append T12:00:00 to avoid timezone issues with YYYY-MM-DD strings causing day shift
-    // Assuming inputs are YYYY-MM-DD
+    // Improve parsing: check if T exists (ISO) or Date Object?
+    // Supabase usually returns YYYY-MM-DD for date columns.
     const parseDate = (dateStr?: string) => {
         if (!dateStr) return null;
+        // Check if looks like ISO
+        if (dateStr.includes('T')) {
+            const d = new Date(dateStr);
+            d.setHours(0, 0, 0, 0);
+            return isNaN(d.getTime()) ? null : d;
+        }
+        // Assume YYYY-MM-DD
         const d = new Date(dateStr + 'T12:00:00');
         d.setHours(0, 0, 0, 0);
-        return d;
+        return isNaN(d.getTime()) ? null : d;
     };
 
     const start = parseDate(inscricaoInicio);
     const end = parseDate(inscricaoFim);
     const exam = parseDate(prova);
 
+    // If start date is invalid, prevent falling back to DB status if possible, 
+    // OR just return DB status but log/warn (internal).
     if (!start) return concurso.status;
 
-    // 1. Antes do início das inscrições -> "Edital Aberto"
+    // 1. Antes do início das inscrições -> "Edital Publicado"
     if (now < start) {
-        return 'Edital Aberto';
+        return 'Edital Publicado';
     }
 
     // 2. Entre início e fim (inclusive) -> "Inscrições Abertas"
-    // Note: If no end date, assume open indefinitely? Or fallback? Assuming having end date.
     if (end && now <= end) {
         return 'Inscrições Abertas';
     }
 
-    // If here, we are past the end date (or no end date provided, but usually required)
-    // 3. Após fim inscrições e antes da prova -> "Em Andamento"
+    // 3. Após fim inscrições e antes da prova (ou se prova for hoje?) -> "Em Andamento"
+    // Usually "Em Andamento" means subscriptions closed, waiting for exam.
     if (exam && now < exam) {
         return 'Em Andamento';
     }
@@ -46,10 +54,10 @@ export const getConcursoStatus = (concurso: Concurso): string => {
         return 'Provas Realizadas';
     }
 
-    // Fallback if past subscriptions but no exam date? "Em Andamento" seems safe.
+    // Fallback if past subscriptions but no exam date?
     if (!exam && end && now > end) {
         return 'Em Andamento';
     }
 
-    return 'Inscrições Abertas'; // Default fallback if started and no end date?
+    return 'Inscrições Abertas';
 };

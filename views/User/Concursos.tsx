@@ -58,7 +58,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
 
   const getStatusTag = (status: string) => {
     const baseClasses = "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold border transition-all";
-    if (status === "Inscrições Abertas" || status === "Edital Aberto") return <span className={`${baseClasses} bg-emerald-50 text-emerald-600 border-emerald-100/50`}><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> {status}</span>;
+    if (status === "Inscrições Abertas" || status === "Edital Publicado") return <span className={`${baseClasses} bg-emerald-50 text-emerald-600 border-emerald-100/50`}><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> {status}</span>;
     if (status === "Em Andamento") return <span className={`${baseClasses} bg-blue-50 text-blue-600 border-blue-100/50`}><span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span> {status}</span>;
     if (status === "Provas Realizadas") return <span className={`${baseClasses} bg-slate-100 text-slate-600 border-slate-200`}><span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span> {status}</span>;
     if (status === "Últimos Dias") return <span className={`${baseClasses} bg-red-50 text-red-600 border-red-100/50 animate-pulse`}><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> Últimos Dias</span>;

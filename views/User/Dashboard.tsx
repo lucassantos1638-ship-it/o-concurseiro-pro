@@ -201,7 +201,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
 
           {concursos.map((concurso) => {
             const status = getConcursoStatus(concurso);
-            const isHighlighted = status === 'Inscrições Abertas' || status === 'Edital Aberto';
+            const isHighlighted = status === 'Inscrições Abertas' || status === 'Edital Publicado';
             return (
               <div
                 key={concurso.id}

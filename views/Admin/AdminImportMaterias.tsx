@@ -1,4 +1,4 @@
-```
+
 import React, { useState } from 'react';
 import { read, utils } from 'xlsx';
 import { AppState, Cargo, Concurso, Materia, Nivel } from '../../types';
@@ -73,7 +73,7 @@ const AdminImportMaterias: React.FC<AdminImportMateriasProps> = ({ state, update
 
             setPreviewData(normalizedData);
             setStep('preview');
-            addLog(`✅ Arquivo processado.${ normalizedData.length } associações encontradas.`);
+            addLog(`✅ Arquivo processado.${normalizedData.length} associações encontradas.`);
 
         } catch (error) {
             console.error(error);
@@ -114,7 +114,7 @@ const AdminImportMaterias: React.FC<AdminImportMateriasProps> = ({ state, update
                 const cargo = contestCargos.find(c => c.nome.toLowerCase().trim() === cargoName);
 
                 if (!cargo) {
-                    addLog(`⚠️ Cargo não encontrado no concurso: ${ row.Cargo } `);
+                    addLog(`⚠️ Cargo não encontrado no concurso: ${row.Cargo} `);
                     continue;
                 }
 
@@ -134,7 +134,7 @@ const AdminImportMaterias: React.FC<AdminImportMateriasProps> = ({ state, update
 
                 if (!materia) {
                     // Create new materia
-                    addLog(`🆕 Criando nova matéria: ${ item.materiaName } (Nível: ${ item.nivel })`);
+                    addLog(`🆕 Criando nova matéria: ${item.materiaName} (Nível: ${item.nivel})`);
 
                     const newMat = {
                         nome: item.materiaName,
@@ -149,7 +149,7 @@ const AdminImportMaterias: React.FC<AdminImportMateriasProps> = ({ state, update
                         .single();
 
                     if (errMat || !insertedMat) {
-                        addLog(`❌ Erro ao criar matéria ${ item.materiaName }: ${ errMat?.message } `);
+                        addLog(`❌ Erro ao criar matéria ${item.materiaName}: ${errMat?.message} `);
                         continue;
                     }
 
@@ -188,7 +188,7 @@ const AdminImportMaterias: React.FC<AdminImportMateriasProps> = ({ state, update
                     .upsert(linkageData, { onConflict: 'cargo_id,materia_id' }); // Explicitly stating conflict content
 
                 if (errLink) {
-                    addLog(`❌ Erro ao vincular ${ item.materiaName } em ${ updatedCargos[cargoIndex].nome }: ${ errLink.message } `);
+                    addLog(`❌ Erro ao vincular ${item.materiaName} em ${updatedCargos[cargoIndex].nome}: ${errLink.message} `);
                 } else {
                     // Update local state for immediate feedback/preview if needed, 
                     // though syncing 'cargos_materias' perfectly to 'cargos.materiasConfig' locally is complex without full re-fetch.
@@ -218,14 +218,14 @@ const AdminImportMaterias: React.FC<AdminImportMateriasProps> = ({ state, update
                 cargos: updatedCargos,
                 materias: updatedMaterias
             });
-            
+
             onRefresh(); // Refresh data from backend to ensure consistency
 
-            addLog(`✅ Processo finalizado! ${ processedCount } configurações aplicadas.`);
+            addLog(`✅ Processo finalizado! ${processedCount} configurações aplicadas.`);
             setStep('success');
 
         } catch (error: any) {
-            addLog(`❌ Erro CRÍTICO: ${ error.message } `);
+            addLog(`❌ Erro CRÍTICO: ${error.message} `);
         } finally {
             setIsLoading(false);
         }
@@ -262,7 +262,7 @@ const AdminImportMaterias: React.FC<AdminImportMateriasProps> = ({ state, update
                         </div>
 
                         {step === 'upload' && (
-                            <div className={`transition - all ${ !selectedConcursoId ? 'opacity-50 pointer-events-none' : '' } `}>
+                            <div className={`transition - all ${!selectedConcursoId ? 'opacity-50 pointer-events-none' : ''} `}>
                                 <label
                                     className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:border-primary/50 hover:bg-slate-50 transition-all group"
                                 >

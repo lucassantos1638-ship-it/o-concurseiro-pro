@@ -6,6 +6,7 @@ import AdminCargos from './AdminCargos';
 import AdminMaterias from './AdminMaterias';
 import AdminQuestoes from './AdminQuestoes';
 import AdminImport from './AdminImport';
+import AdminImportPdf from './AdminImportPdf';
 import AdminWebhooks from './AdminWebhooks';
 import AdminBackup from './AdminBackup';
 
@@ -26,6 +27,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ state, updateState, onExitAdm
       case 'materias': return <AdminMaterias state={state} updateState={updateState} onRefresh={onRefresh} />;
       case 'questoes': return <AdminQuestoes state={state} updateState={updateState} onRefresh={onRefresh} />;
       case 'importar': return <AdminImport state={state} updateState={updateState} />;
+      case 'importar-pdf': return <AdminImportPdf state={state} updateState={updateState} />;
       case 'webhooks': return <AdminWebhooks />;
       case 'backup': return <AdminBackup />;
       default: return null;
@@ -41,13 +43,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ state, updateState, onExitAdm
             Painel Gestor
           </h2>
           <nav className="flex gap-2">
-            {['concursos', 'cargos', 'materias', 'questoes', 'importar', 'webhooks', 'backup'].map((tab) => (
+            {['concursos', 'cargos', 'materias', 'questoes', 'importar', 'importar-pdf', 'webhooks', 'backup'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setCurrentTab(tab)}
                 className={`px-4 py-1.5 text-[10px] font-black tracking-widest rounded-xl transition-all whitespace-nowrap uppercase ${currentTab === tab ? 'bg-primary text-white shadow-lg' : 'hover:bg-slate-800 text-slate-400'}`}
               >
-                {tab === 'importar' ? 'Excel Import' : tab}
+                {tab === 'importar' ? 'Excel Import' : tab === 'importar-pdf' ? 'IA Import (PDF)' : tab}
               </button>
             ))}
           </nav>

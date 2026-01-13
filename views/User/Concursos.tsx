@@ -97,8 +97,8 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                     <button
                       onClick={() => onToggleMyCargo(cargo.id)}
                       className={`w-full py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all shadow-xl flex items-center justify-center gap-3 ${isMyCargo
-                          ? 'bg-red-500 text-white shadow-red-500/20'
-                          : 'bg-primary text-white shadow-primary/40 hover:scale-[1.02] active:scale-95'
+                        ? 'bg-red-500 text-white shadow-red-500/20'
+                        : 'bg-primary text-white shadow-primary/40 hover:scale-[1.02] active:scale-95'
                         }`}
                     >
                       <span className="material-symbols-outlined text-base">{isMyCargo ? 'cancel' : 'check_circle'}</span>
@@ -235,7 +235,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
             </div>
 
             <div className="px-4 md:px-8 pb-8 pt-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-8">
                 <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
                   <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Salários até</span>
                   <p className="text-sm md:text-xl font-black text-emerald-600 truncate">{selectedConcurso.salarioMaximo || 'A definir'}</p>
@@ -244,9 +244,15 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                   <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Vagas (AC + PCD)</span>
                   <p className="text-sm md:text-xl font-black text-slate-900">{selectedConcurso.totalVagas ? `${selectedConcurso.totalVagas}` : 'A definir'}</p>
                 </div>
-                <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100 col-span-2 md:col-span-1">
+                <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
                   <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Data da Prova</span>
                   <p className="text-sm md:text-xl font-black text-slate-900">{formatDate(selectedConcurso.datas.prova)}</p>
+                </div>
+                <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
+                  <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Local</span>
+                  <p className="text-sm md:text-xl font-black text-slate-900 truncate" title={selectedConcurso.cidades.join(', ')}>
+                    {selectedConcurso.cidades.length > 1 ? 'Múltiplos' : (selectedConcurso.cidades[0] || 'Nacional')}
+                  </p>
                 </div>
               </div>
 
@@ -293,8 +299,8 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                         </td>
                         <td className="p-5">
                           <span className={`inline-block px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wide border ${cargo.nivel === 'Superior' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
-                              cargo.nivel === 'Médio' ? 'bg-teal-50 text-teal-600 border-teal-100' :
-                                'bg-slate-50 text-slate-500 border-slate-100'
+                            cargo.nivel === 'Médio' ? 'bg-teal-50 text-teal-600 border-teal-100' :
+                              'bg-slate-50 text-slate-500 border-slate-100'
                             }`}>
                             {cargo.nivel}
                           </span>
@@ -405,7 +411,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                     </h3>
                     <p className="text-[11px] font-semibold text-slate-400 mt-0.5 uppercase tracking-tighter">{concurso.orgao} • {concurso.banca}</p>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-4 pt-4 mt-4 border-t border-slate-50">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-x-4 gap-y-4 pt-4 mt-4 border-t border-slate-50">
                       <div className="flex flex-col">
                         <span className="text-[9px] font-bold text-slate-400 uppercase">Salário Máx</span>
                         <span className="text-xs font-bold text-[#111827] mt-0.5 truncate">{concurso.salarioMaximo || '-'}</span>
@@ -417,6 +423,12 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                       <div className="flex flex-col">
                         <span className="text-[9px] font-bold text-slate-400 uppercase">Nível</span>
                         <span className="text-xs font-bold text-[#111827] mt-0.5">{nivelExibicao}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase">Local</span>
+                        <span className="text-xs font-bold text-[#111827] mt-0.5 truncate" title={concurso.cidades.join(', ')}>
+                          {concurso.cidades.length > 1 ? 'Várias Cidades' : (concurso.cidades[0] || 'Nacional')}
+                        </span>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-[9px] font-bold text-slate-400 uppercase">{dataLabel}</span>

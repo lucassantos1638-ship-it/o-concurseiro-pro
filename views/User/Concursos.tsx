@@ -235,7 +235,19 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
             </div>
 
             <div className="px-4 md:px-8 pb-8 pt-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-8">
+                <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
+                  <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Inscrição Início</span>
+                  <p className="text-sm md:text-xl font-black text-slate-900">{formatDate(selectedConcurso.datas.inscricaoInicio)}</p>
+                </div>
+                <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
+                  <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Inscrição Fim</span>
+                  <p className="text-sm md:text-xl font-black text-slate-900">{formatDate(selectedConcurso.datas.inscricaoFim)}</p>
+                </div>
+                <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
+                  <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Data da Prova</span>
+                  <p className="text-sm md:text-xl font-black text-slate-900">{formatDate(selectedConcurso.datas.prova)}</p>
+                </div>
                 <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
                   <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Salários até</span>
                   <p className="text-sm md:text-xl font-black text-emerald-600 truncate">{selectedConcurso.salarioMaximo || 'A definir'}</p>
@@ -243,10 +255,6 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                 <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
                   <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Vagas (AC + PCD)</span>
                   <p className="text-sm md:text-xl font-black text-slate-900">{selectedConcurso.totalVagas ? `${selectedConcurso.totalVagas}` : 'A definir'}</p>
-                </div>
-                <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
-                  <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Data da Prova</span>
-                  <p className="text-sm md:text-xl font-black text-slate-900">{formatDate(selectedConcurso.datas.prova)}</p>
                 </div>
                 <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
                   <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Local</span>

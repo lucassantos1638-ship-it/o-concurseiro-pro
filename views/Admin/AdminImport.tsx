@@ -71,26 +71,36 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                 const headerRow = rows[headerRowIndex].map((h: any) => h?.toString().toLowerCase().trim());
                 const dataRows = rows.slice(headerRowIndex + 1);
 
-                // Map columns
-                const getColIdx = (term: string) => headerRow.findIndex((h: string) => h.includes(term));
+                // Helper to find column index with multiple potential headers
+                const findCol = (terms: string[]) => {
+                    return headerRow.findIndex((h: string) => terms.some(t => h.includes(t)));
+                };
 
-                const idxNomeConcurso = getColIdx('nome do concurso');
-                const idxBanca = getColIdx('banca');
-                const idxOrgao = getColIdx('órgão') > -1 ? getColIdx('órgão') : getColIdx('orgao');
-                const idxNivel = getColIdx('nivel') > -1 ? getColIdx('nivel') : getColIdx('nível');
-                const idxCargo = getColIdx('cargo'); // careful not to match 'carga'
-                const idxAmpla = getColIdx('ampla');
-                const idxPCD = getColIdx('pcd');
-                const idxPN = getColIdx('pn') > -1 ? getColIdx('pn') : (getColIdx('negro') > -1 ? getColIdx('negro') : getColIdx('cota'));
-                const idxCR = getColIdx('reserva');
-                const idxTotal = getColIdx('total de vagas');
-                const idxSalario = getColIdx('salário') > -1 ? getColIdx('salário') : getColIdx('salario');
-                const idxCargaHoraria = getColIdx('carga horária') > -1 ? getColIdx('carga horária') : getColIdx('carga horaria');
-                const idxRequisitos = getColIdx('requisitos');
-                const idxCidade = getColIdx('cidade');
-                const idxInicio = getColIdx('inicio') > -1 ? getColIdx('inicio') : getColIdx('início');
-                const idxFim = getColIdx('fim');
-                const idxProva = getColIdx('data da prova');
+                const idxNomeConcurso = findCol(['nome do concurso', 'concurso']);
+                const idxBanca = findCol(['banca']);
+                const idxOrgao = findCol(['avaliação', 'orgao', 'órgão']);
+                const idxNivel = findCol(['nivel', 'nível', 'escolaridade']);
+                const idxCargo = findCol(['cargo', 'função', 'nome do cargo']);
+
+                // Vacancies Matching - More Robust
+                const idxAmpla = findCol(['ampla', 'ac', 'universal', 'geral', 'vagas']); // 'vagas' is risky if generic, put lat
+                // Better strategy: strict checks first
+                const idxPCD = findCol(['pcd', 'p.c.d', 'deficiente', 'deficiência']);
+                const idxPN = findCol(['pn', 'negro', 'preto', 'pardo', 'cota', 'ppp', 'afro']);
+                const idxCR = findCol(['reserva', 'cr', 'cadastro']);
+
+                // If specific 'vagas' column exists without modifiers, it might be total or ampla depending on context
+                // Let's assume 'total' explicit header takes precedence
+                const idxTotal = findCol(['total', 'vagas total']);
+
+                const idxSalario = findCol(['salário', 'salario', 'remuneração', 'vencimento']);
+                const idxCargaHoraria = findCol(['carga', 'jornada', 'horas']);
+                const idxRequisitos = findCol(['requisitos', 'escolaridade']);
+                const idxCidade = findCol(['cidade', 'município', 'local']);
+
+                const idxInicio = findCol(['inicio', 'início']);
+                const idxFim = findCol(['fim']);
+                const idxProva = findCol(['prova', 'data da prova']);
 
                 // Extract Concurso Metadata (from first valid row)
                 if (mode === 'new' && dataRows.length > 0) {

@@ -92,21 +92,35 @@ const AdminImportPdf: React.FC<AdminImportPdfProps> = ({ state, updateState }) =
             addLog('Concurso salvo.');
 
             // 2. Salvar Matérias e Cargos
-            // Precisamos primeiro criar as matérias para ter os IDs, ou verificar se já existem
+            const { data: existingMaterias } = await supabase.from('materias').select('id, nome, nivel_compativel');
             const materiasMap = new Map<string, string>(); // Nome -> ID
 
             for (const mat of previewData.materias) {
-                const matId = Math.random().toString(36).substr(2, 9);
-                // Simplificação: criando sempre novas matérias para esse concurso ou idealmente buscar existentes pelo nome
-                // Para evitar duplicidade global, check se existe seria bom, mas para MVP vamos criar.
-                const { error: errMat } = await supabase.from('materias').insert({
-                    id: matId,
-                    nome: mat.nome,
-                    categoria: mat.categoria,
-                    nivel_compativel: mat.nivel_compativel
-                });
-                if (errMat) console.warn('Erro ao salvar materia', mat.nome, errMat);
-                materiasMap.set(mat.nome, matId);
+                const normalizedName = mat.nome.trim().toLowerCase();
+                const existing = existingMaterias?.find(em =>
+                    em.nome.trim().toLowerCase() === normalizedName &&
+                    em.nivel_compativel === mat.nivel_compativel
+                );
+
+                if (existing) {
+                    materiasMap.set(mat.nome, existing.id);
+                    // Opcional: Logar que encontrou
+                } else {
+                    const matId = Math.random().toString(36).substr(2, 9);
+                    const { error: errMat } = await supabase.from('materias').insert({
+                        id: matId,
+                        nome: mat.nome,
+                        categoria: mat.categoria,
+                        nivel_compativel: mat.nivel_compativel
+                    });
+
+                    if (!errMat) {
+                        materiasMap.set(mat.nome, matId);
+                        addLog(`Nova matéria criada: ${mat.nome} (${mat.nivel_compativel})`);
+                    } else {
+                        console.warn('Erro ao salvar materia', mat.nome, errMat);
+                    }
+                }
             }
             addLog(`${previewData.materias.length} matérias processadas.`);
 
@@ -120,6 +134,7 @@ const AdminImportPdf: React.FC<AdminImportPdfProps> = ({ state, updateState }) =
                     nivel: car.nivel,
                     vagas_amplas: car.vagas_amplas,
                     vagas_pcd: car.vagas_pcd,
+                    vagas_pn: car.vagas_pn || 0, // Ensure PN is handled if AI extracts it
                     vagas_cr: car.vagas_cr,
                     total_vagas: car.total_vagas,
                     salario: car.salario,
@@ -130,14 +145,23 @@ const AdminImportPdf: React.FC<AdminImportPdfProps> = ({ state, updateState }) =
                 if (errCar) throw errCar;
 
                 // Vincular materias ao cargo
-                const materiasDoCargo = previewData.cargos_materias.filter((cm: any) => cm.cargo_nome === car.nome);
+                // Improved matching: trim and lowercase
+                const materiasDoCargo = previewData.cargos_materias.filter((cm: any) =>
+                    cm.cargo_nome.trim().toLowerCase() === car.nome.trim().toLowerCase()
+                );
+
+                if (materiasDoCargo.length === 0) {
+                    addLog(`⚠ Alerta: Nenhuma matéria vinculada para o cargo ${car.nome}. Verifique se os nomes batem.`);
+                }
+
                 for (const mc of materiasDoCargo) {
                     const mId = materiasMap.get(mc.materia_nome);
-                    // Match fuzzy poderia ser necessário aqui, mas assumindo que a IA gera nomes consistentes
                     if (mId) {
                         await supabase.from('cargos_materias').insert({
                             cargo_id: cargoId,
-                            materia_id: mId
+                            materia_id: mId,
+                            peso: mc.peso || 1,
+                            quantidade_questoes: mc.quantidade_questoes || 10
                         });
                     }
                 }

@@ -5,72 +5,74 @@ export const getConcursoStatus = (concurso: Concurso): string => {
     // Set to midnight to compare dates only
     now.setHours(0, 0, 0, 0);
 
-    const { inscricaoInicio, inscricaoFim, prova } = concurso.datas;
+    const { inscricaoInicio, inscricaoFim, prova, edital } = concurso.datas;
 
-    if (!inscricaoInicio) return concurso.status;
-
-    // Improve parsing: check if T exists (ISO) or Date Object?
-    // Supabase usually returns YYYY-MM-DD for date columns.
     const parseDate = (dateStr?: string) => {
         if (!dateStr) return null;
 
-        // Handle DD/MM/YYYY (common in Brazil)
-        if (dateStr.includes('/')) {
+        let d: Date;
+        // Improve parsing logic to handle ISO and DD/MM/YYYY
+        if (dateStr.includes('T')) {
+            d = new Date(dateStr);
+        } else if (dateStr.includes('/')) {
             const parts = dateStr.split('/');
             if (parts.length === 3) {
-                // assume dd/mm/yyyy
-                const d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T12:00:00`);
-                d.setHours(0, 0, 0, 0);
-                return isNaN(d.getTime()) ? null : d;
+                // dd/mm/yyyy -> yyyy-mm-dd
+                d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T12:00:00`);
+            } else {
+                return null;
             }
+        } else {
+            // Assume YYYY-MM-DD
+            d = new Date(dateStr + 'T12:00:00');
         }
 
-        // Check if looks like ISO
-        if (dateStr.includes('T')) {
-            const d = new Date(dateStr);
-            d.setHours(0, 0, 0, 0);
-            return isNaN(d.getTime()) ? null : d;
-        }
+        if (isNaN(d.getTime())) return null;
 
-        // Assume YYYY-MM-DD
-        const d = new Date(dateStr + 'T12:00:00');
         d.setHours(0, 0, 0, 0);
-        return isNaN(d.getTime()) ? null : d;
+        return d;
     };
 
     const start = parseDate(inscricaoInicio);
     const end = parseDate(inscricaoFim);
     const exam = parseDate(prova);
+    const editalDate = parseDate(edital);
 
-    // If start date is invalid, prevent falling back to DB status if possible, 
-    // OR just return DB status but log/warn (internal).
-    if (!start) return concurso.status;
-
-    // 1. Antes do início das inscrições -> "Edital Publicado"
-    if (now < start) {
-        return 'Edital Publicado';
-    }
-
-    // 2. Entre início e fim (inclusive) -> "Inscrições Abertas"
-    if (end && now <= end) {
-        return 'Inscrições Abertas';
-    }
-
-    // 3. Após fim inscrições e antes da prova (ou se prova for hoje?) -> "Em Andamento"
-    // Usually "Em Andamento" means subscriptions closed, waiting for exam.
-    if (exam && now < exam) {
-        return 'Em Andamento';
-    }
-
-    // 4. Após (ou na) data da prova -> "Provas Realizadas"
-    if (exam && now >= exam) {
+    // 1. Pós prova -> "Provas Realizadas"
+    // "depois que passar o dia da prova" (now estritamente maior que data da prova)
+    if (exam && now > exam) {
         return 'Provas Realizadas';
     }
 
-    // Fallback if past subscriptions but no exam date?
-    if (!exam && end && now > end) {
+    // 2. Terminou inscrições (e ainda não passou prova) -> "Em Andamento"
+    // "depois em andamento quando finalizar as inscrições"
+    if (end && now > end) {
         return 'Em Andamento';
     }
 
-    return 'Inscrições Abertas';
+    // 3. Dentro do período de inscrições -> "Inscrições Abertas"
+    // "depois inscrições abertas quando chegar na data das inscrições"
+    if (start && now >= start) {
+        return 'Inscrições Abertas';
+    }
+
+    // 4. Edital saiu (antes das inscrições) -> "Edital Publicado"
+    // "puxar pela data cadastrada no cadastro do concurso, edital aberto"
+    // Se temos data de início e hoje é antes, então Edital já foi publicado.
+    if (start && now < start) {
+        return 'Edital Publicado';
+    }
+
+    // Se tiver data de edital explícita e já passou
+    if (editalDate && now >= editalDate) {
+        return 'Edital Publicado';
+    }
+
+    // Fallback para datas futuras ainda não alcançadas
+    if (editalDate || start || end || exam) {
+        return 'Previsto';
+    }
+
+    // Se não tiver datas, usa o status manual do banco
+    return concurso.status;
 };

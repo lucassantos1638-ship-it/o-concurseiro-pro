@@ -12,7 +12,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
   const { concursos, userProgress, ranking, myCargosIds, cargos } = state;
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const [isPaused, setIsPaused] = useState(false);
+  const isPaused = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -135,10 +135,14 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
 
   // Efeito de Scroll Automático do Carrossel
   useEffect(() => {
-    if (!scrollRef.current || isPaused || isDragging || concursos.length <= 1) return;
+    // Remove isPaused dependencies effectively
+    if (!scrollRef.current || concursos.length <= 1) return;
+
     const interval = setInterval(() => {
+      // Check ref inside interval
+      if (isPaused.current || isDragging || !scrollRef.current) return;
+
       const container = scrollRef.current;
-      if (!container) return;
       const cardWidth = container.firstElementChild?.clientWidth || 0;
       const gap = 20;
       const scrollAmount = cardWidth + gap;
@@ -150,7 +154,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
       }
     }, 5000);
     return () => clearInterval(interval);
-  }, [concursos.length, isPaused, isDragging]);
+  }, [concursos.length, isDragging]); // removed isPaused
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return;
@@ -190,8 +194,8 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
 
         <div
           ref={scrollRef}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => { setIsPaused(false); handleMouseUp(); }}
+          onMouseEnter={() => { isPaused.current = true; }}
+          onMouseLeave={() => { isPaused.current = false; handleMouseUp(); }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}

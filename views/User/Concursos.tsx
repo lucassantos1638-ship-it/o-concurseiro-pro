@@ -138,7 +138,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                     <p className="text-sm font-black text-slate-800 ml-4">{cargo.totalVagas}</p>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-4 gap-2">
                     <div className="bg-white p-3 rounded-xl border border-slate-100 text-center">
                       <span className="text-[8px] font-black text-slate-400 uppercase block mb-1">Ampla</span>
                       <p className="text-sm font-black text-slate-700">{cargo.vagasAmplas}</p>
@@ -146,6 +146,10 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                     <div className="bg-white p-3 rounded-xl border border-slate-100 text-center">
                       <span className="text-[8px] font-black text-slate-400 uppercase block mb-1">PCD</span>
                       <p className="text-sm font-black text-slate-700">{cargo.vagasPcd}</p>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-slate-100 text-center">
+                      <span className="text-[8px] font-black text-slate-400 uppercase block mb-1">PN</span>
+                      <p className="text-sm font-black text-slate-700">{cargo.vagasPn || 0}</p>
                     </div>
                     <div className="bg-white p-3 rounded-xl border border-slate-100 text-center">
                       <span className="text-[8px] font-black text-slate-400 uppercase block mb-1">CR</span>

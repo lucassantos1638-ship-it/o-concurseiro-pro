@@ -30,7 +30,9 @@ export function useCoreData() {
                 links: {
                     oficial: c.link_oficial,
                     inscricoes: c.link_inscricoes,
-                    editalPdf: c.link_edital
+                    editalPdf: c.link_edital,
+                    apostilas: c.link_apostilas,
+                    cursos: c.link_cursos // Mapping explicitly if needed, though Admin uses oficial for courses
                 },
                 observacoes: c.observacoes,
                 imageUrl: c.image_url,

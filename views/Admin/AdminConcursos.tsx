@@ -50,7 +50,7 @@ const AdminConcursos: React.FC<AdminConcursosProps> = ({ state, updateState, onR
             linkInscricao: c.links.inscricoes || '',
             linkEdital: c.links.editalPdf || '',
             linkApostila: c.links.apostilas || '',
-            linkCurso: c.links.cursos || '',
+            linkCurso: c.links.oficial || '', // Fixed mapping: linkCurso uses oficial link
             capaUrl: c.imageUrl || '',
             subCapaUrl: c.subCoverUrl || '',
             status: c.status,
@@ -90,6 +90,7 @@ const AdminConcursos: React.FC<AdminConcursosProps> = ({ state, updateState, onR
             link_oficial: formData.linkCurso || '', // Using linkCurso as official link
             link_inscricoes: formData.linkInscricao || '',
             link_edital: formData.linkEdital || '',
+            link_apostilas: formData.linkApostila || '', // Added missing field
             observacoes: formData.descricao || '',
             image_url: formData.capaUrl || '',
             sub_cover_url: formData.subCapaUrl || '',

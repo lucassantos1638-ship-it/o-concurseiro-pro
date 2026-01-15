@@ -103,7 +103,7 @@ const AdminConcursos: React.FC<AdminConcursosProps> = ({ state, updateState, onR
                 if (error) throw error;
             } else {
                 const { error } = await supabase.from('concursos').insert({
-                    id: Math.random().toString(36).substr(2, 9),
+                    id: crypto.randomUUID(),
                     ...payload
                 });
                 if (error) throw error;

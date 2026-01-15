@@ -67,33 +67,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
 
 
 
-  // Determina o cargo principal para exibição no Dashboard
-  // 1. Tenta pegar dos favoritos (Meus Cargos)
-  // 2. Se não tiver favoritos, tenta pegar do último item do histórico (o que ele estudou por último)
-  const userMainCargoId = useMemo(() => {
-    if (state.myCargosIds.length > 0) return state.myCargosIds[0];
 
-    // Tenta inferir pelo histórico
-    if (userProgress.history && userProgress.history.length > 0) {
-      // Pega o último respondido
-      const lastAnswer = userProgress.history[userProgress.history.length - 1];
-      // Nota: O histórico atual salva { questaoId, data... }. Precisamos garantir que temos o cargoId.
-      // Se o histórico não tiver cargoId explícito, podemos ter problema.
-      // O app atual não parece salvar cargoId no history diretamente, mas vamos assumir que 
-      // se o usuário está jogando, ele está num contexto.
-      // HACK: Como o history pode não ter cargoId fácil, vamos tentar pegar do state global se possível
-      // Mas se o usuário diz que "já tinha que aparecer", ele provavelmente espera ver o ranking do que ele acabou de fazer.
-
-      // Se não tivermos o cargo no history, vamos tentar usar o comportamento padrão (retornar undefined).
-      // MAS, se o usuário respondeu perguntas, ele deve ter passado por SimuladoQuestaoView.
-      // Se o histórico realmente não tiver vínculo com cargo, estamos limitados.
-      // Porem, vamos assumir que o usuário adicionou aos favoritos OU o sistema deveria ter adicionado.
-
-      // Se não acharmos, retornamos undefined e o ranking ficará vazio.
-      return undefined;
-    }
-    return undefined;
-  }, [state.myCargosIds, userProgress.history]);
 
   // Se ainda assim não tiver ID (e o histórico não ajudou), podemos tentar 'chutar' o primeiro cargo disponível se quisermos forçar, 
   // mas o correto é o usuário ter um cargo. 
@@ -105,33 +79,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
 
   // Vamos manter a lógica de myCargosIds. Se não aparecer, é porque não está em myCargosIds.
 
-  const dashboardRanking = useMemo(() => {
-    // Se não tiver cargo principal, não mostra ranking
-    if (!userMainCargoId) return [];
 
-    // Criar entrada do usuário atual
-    const myEntry: any = {
-      id: 'me',
-      userName: state.userProfile.name,
-      city: state.userProfile.city,
-      state: state.userProfile.state,
-      accuracyRate: state.userProgress.accuracyRate,
-      questionsResolved: state.userProgress.questionsResolved,
-      cargoId: userMainCargoId,
-      avatar: state.userProfile.profilePicture
-    };
-
-    // Combinar com ranking existente
-    // Remove usuário atual para reinserir com dados corretos de cargo
-    const listWithoutMe = state.ranking.filter(r => r.userName !== state.userProfile.name);
-    const list = [...listWithoutMe, myEntry];
-
-    // Filtrar pelo cargo
-    return list
-      .filter(r => r.cargoId === userMainCargoId)
-      .sort((a, b) => b.accuracyRate - a.accuracyRate)
-      .slice(0, 4);
-  }, [state.ranking, userMainCargoId, state.userProfile, state.userProgress]);
 
   // Efeito de Scroll Automático do Carrossel
   useEffect(() => {
@@ -293,43 +241,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ state, setActiveTab }) => {
       </section>
 
       {/* Seção de Ranking - Dashboard */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-slate-900 tracking-tight">Líderes do Grupo{userMainCargoId && cargos.find(c => c.id === userMainCargoId) ? ` - ${cargos.find(c => c.id === userMainCargoId)?.nome}` : ''}</h3>
-          <button onClick={() => setActiveTab('ranking')} className="text-xs font-bold text-primary hover:underline">Ver ranking completo</button>
-        </div>
-        <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
-          {dashboardRanking.map((entry, idx) => {
-            const isMe = entry.userName === state.userProfile.name;
-            return (
-              <div key={entry.id} className={`flex items-center justify-between p-5 ${idx !== dashboardRanking.length - 1 ? 'border-b border-slate-50' : ''} ${isMe ? 'bg-primary/[0.03]' : ''}`}>
-                <div className="flex items-center gap-4">
-                  <span className={`w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold border ${idx === 0 ? 'bg-amber-100 text-amber-600 border-amber-200' : 'bg-slate-100 text-slate-400 border-slate-200'}`}>
-                    {idx + 1}
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full border border-slate-100 overflow-hidden">
-                      <img src={entry.avatar} className="h-full w-full object-cover" alt="" />
-                    </div>
-                    <div>
-                      <p className={`text-sm font-bold tracking-tight ${isMe ? 'text-primary' : 'text-slate-800'}`}>
-                        {entry.userName} {isMe && <span className="text-[7px] bg-primary text-white px-1 rounded-full ml-1">VOCÊ</span>}
-                      </p>
-                      <p className="text-[10px] font-semibold text-slate-400 uppercase">{entry.city} • {entry.state}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-black text-primary">{entry.accuracyRate}%</span>
-                </div>
-              </div>
-            );
-          })}
-          {dashboardRanking.length === 0 && (
-            <div className="p-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">Aguardando dados de simulados</div>
-          )}
-        </div>
-      </section>
+
 
       <section className="mb-20">
         <h3 className="mb-6 text-xl font-bold text-slate-900 tracking-tight">Acesso Rápido</h3>

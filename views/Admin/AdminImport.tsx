@@ -122,16 +122,30 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                     }
                 }
 
+                // Safe parser for vacancies
+                const safeParseInt = (val: any) => {
+                    if (!val) return 0;
+                    const str = val.toString().replace(/\D/g, ''); // Extract digits only
+                    const num = parseInt(str);
+                    return isNaN(num) ? 0 : num;
+                };
+
                 // Extract Cargos
                 const cargos: Partial<Cargo>[] = dataRows.map(cols => {
                     if (!cols[idxCargo]) return null;
 
-                    const vAmplas = parseInt(cols[idxAmpla]) || 0;
-                    const vCR = parseInt(cols[idxCR]) || 0;
-                    const vPcd = parseInt(cols[idxPCD]) || 0;
-                    const vPn = parseInt(cols[idxPN]) || 0;
-                    const totalInformado = parseInt(cols[idxTotal]);
-                    const total = isNaN(totalInformado) ? (vAmplas + vCR + vPcd + vPn) : totalInformado;
+                    const vAmplas = safeParseInt(cols[idxAmpla]);
+                    const vCR = safeParseInt(cols[idxCR]);
+                    const vPcd = safeParseInt(cols[idxPCD]);
+                    const vPn = safeParseInt(cols[idxPN]);
+
+                    // Logic: Total is either explicit or sum
+                    const totalInformado = safeParseInt(cols[idxTotal]);
+
+                    // Sanity check: If total is huge (e.g. > 1000) and seems like salary/year, ignore it if calculated sum is reasonable
+                    // But usually salary > 1000. 
+                    const calculatedSum = vAmplas + vCR + vPcd + vPn;
+                    const total = (idxTotal > -1 && totalInformado > 0) ? totalInformado : calculatedSum;
 
                     let nivelVal = Nivel.Superior;
                     const rawNivel = cols[idxNivel]?.toString().toLowerCase() || '';

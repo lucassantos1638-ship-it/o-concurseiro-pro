@@ -21,6 +21,7 @@ const AdminCargos: React.FC<AdminCargosProps> = ({ state, updateState, onRefresh
         salario: '',
         vagasAmplas: '',
         vagasPcd: '',
+        vagasPn: '',
         vagasCR: '',
         cargaHoraria: '',
         requisitos: '',
@@ -46,6 +47,7 @@ const AdminCargos: React.FC<AdminCargosProps> = ({ state, updateState, onRefresh
             salario: c.salario,
             vagasAmplas: c.vagasAmplas.toString(),
             vagasPcd: c.vagasPcd.toString(),
+            vagasPn: (c.vagasPn || '').toString(),
             vagasCR: c.vagasCR.toString(),
             cargaHoraria: c.cargaHoraria || '',
             requisitos: c.requisitos || '',
@@ -112,6 +114,7 @@ const AdminCargos: React.FC<AdminCargosProps> = ({ state, updateState, onRefresh
 
         const vAmplas = parseInt(formData.vagasAmplas) || 0;
         const vPcd = parseInt(formData.vagasPcd) || 0;
+        const vPn = parseInt(formData.vagasPn) || 0;
         const vCR = parseInt(formData.vagasCR) || 0;
 
         const cargoPayload = {
@@ -121,8 +124,9 @@ const AdminCargos: React.FC<AdminCargosProps> = ({ state, updateState, onRefresh
             salario: formData.salario,
             vagas_amplas: vAmplas,
             vagas_pcd: vPcd,
+            vagas_pn: vPn, // Added PN column
             vagas_cr: vCR,
-            total_vagas: vAmplas + vPcd + vCR,
+            total_vagas: vAmplas + vPcd + vPn + vCR,
             carga_horaria: formData.cargaHoraria,
             requisitos: formData.requisitos,
             // apostila fields removed or need extra handling if we are to keep them but DB doesn't have columns for them yet?
@@ -162,7 +166,7 @@ const AdminCargos: React.FC<AdminCargosProps> = ({ state, updateState, onRefresh
             onRefresh();
             setShowForm(false);
             setEditingId(null);
-            setFormData({ nome: '', nivel: Nivel.Superior, salario: '', vagasAmplas: '', vagasPcd: '', vagasCR: '', cargaHoraria: '', requisitos: '', materiasConfig: [], apostilaCapa: '', apostilaValor: '', apostilaLink: '' });
+            setFormData({ nome: '', nivel: Nivel.Superior, salario: '', vagasAmplas: '', vagasPcd: '', vagasPn: '', vagasCR: '', cargaHoraria: '', requisitos: '', materiasConfig: [], apostilaCapa: '', apostilaValor: '', apostilaLink: '' });
         } catch (error) {
             console.error('Error saving cargo:', error);
             alert('Erro ao salvar cargo');
@@ -223,9 +227,10 @@ const AdminCargos: React.FC<AdminCargosProps> = ({ state, updateState, onRefresh
                         <input className="w-full border p-3 rounded-xl text-slate-900 bg-white" placeholder="Ex: 40h semanais" value={formData.cargaHoraria} onChange={e => setFormData({ ...formData, cargaHoraria: e.target.value })} />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2 md:col-span-1">
-                        <div className="col-span-3"><label className="text-[10px] font-black text-slate-400 uppercase block mb-2">Vagas</label></div>
+                    <div className="grid grid-cols-4 gap-2 md:col-span-1">
+                        <div className="col-span-4"><label className="text-[10px] font-black text-slate-400 uppercase block mb-2">Vagas</label></div>
                         <div><input type="number" className="w-full border p-2 rounded-lg text-slate-900 bg-white text-xs" placeholder="AC" value={formData.vagasAmplas} onChange={e => setFormData({ ...formData, vagasAmplas: e.target.value })} /></div>
+                        <div><input type="number" className="w-full border p-2 rounded-lg text-slate-900 bg-white text-xs" placeholder="PN" value={formData.vagasPn} onChange={e => setFormData({ ...formData, vagasPn: e.target.value })} /></div>
                         <div><input type="number" className="w-full border p-2 rounded-lg text-slate-900 bg-white text-xs" placeholder="PCD" value={formData.vagasPcd} onChange={e => setFormData({ ...formData, vagasPcd: e.target.value })} /></div>
                         <div><input type="number" className="w-full border p-2 rounded-lg text-slate-900 bg-white text-xs" placeholder="CR" value={formData.vagasCR} onChange={e => setFormData({ ...formData, vagasCR: e.target.value })} /></div>
                     </div>

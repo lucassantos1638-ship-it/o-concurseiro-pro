@@ -81,6 +81,7 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                 const idxCargo = getColIdx('cargo'); // careful not to match 'carga'
                 const idxAmpla = getColIdx('ampla');
                 const idxPCD = getColIdx('pcd');
+                const idxPN = getColIdx('pn') > -1 ? getColIdx('pn') : (getColIdx('negro') > -1 ? getColIdx('negro') : getColIdx('cota'));
                 const idxCR = getColIdx('reserva');
                 const idxTotal = getColIdx('total de vagas');
                 const idxSalario = getColIdx('salário') > -1 ? getColIdx('salário') : getColIdx('salario');
@@ -118,8 +119,9 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                     const vAmplas = parseInt(cols[idxAmpla]) || 0;
                     const vCR = parseInt(cols[idxCR]) || 0;
                     const vPcd = parseInt(cols[idxPCD]) || 0;
+                    const vPn = parseInt(cols[idxPN]) || 0;
                     const totalInformado = parseInt(cols[idxTotal]);
-                    const total = isNaN(totalInformado) ? (vAmplas + vCR + vPcd) : totalInformado;
+                    const total = isNaN(totalInformado) ? (vAmplas + vCR + vPcd + vPn) : totalInformado;
 
                     let nivelVal = Nivel.Superior;
                     const rawNivel = cols[idxNivel]?.toString().toLowerCase() || '';
@@ -133,6 +135,7 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                         vagasAmplas: vAmplas,
                         vagasCR: vCR,
                         vagasPcd: vPcd,
+                        vagasPn: vPn,
                         totalVagas: total,
                         salario: cols[idxSalario]?.toString() || '',
                         cargaHoraria: cols[idxCargaHoraria]?.toString() || '40h',
@@ -202,6 +205,7 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                     nivel: cargo.nivel,
                     vagas_amplas: cargo.vagasAmplas,
                     vagas_pcd: cargo.vagasPcd,
+                    vagas_pn: cargo.vagasPn,
                     vagas_cr: cargo.vagasCR,
                     total_vagas: cargo.totalVagas,
                     salario: cargo.salario,
@@ -285,8 +289,8 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                     <label
                         htmlFor="excel-upload"
                         className={`flex items-center gap-3 px-16 py-5 rounded-3xl font-black uppercase text-[11px] tracking-[0.2em] transition-all shadow-2xl active:scale-95 ${(mode === 'new' || selectedConcursoId)
-                                ? 'bg-slate-900 text-white cursor-pointer hover:bg-emerald-600 shadow-slate-900/20'
-                                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                            ? 'bg-slate-900 text-white cursor-pointer hover:bg-emerald-600 shadow-slate-900/20'
+                            : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                             }`}
                     >
                         <span className="material-symbols-outlined">attach_file</span>
@@ -357,7 +361,7 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                                         <td className="p-6 text-sm font-black text-slate-900 text-center">
                                             {cargo.totalVagas}
                                             <span className="block text-[9px] text-slate-400 font-medium">
-                                                {cargo.vagasAmplas} AC / {cargo.vagasCR} CR
+                                                {cargo.vagasAmplas} AC / {cargo.vagasPn} PN / {cargo.vagasCR} CR
                                             </span>
                                         </td>
                                         <td className="p-6 text-sm font-black text-emerald-600 whitespace-nowrap">{cargo.salario}</td>

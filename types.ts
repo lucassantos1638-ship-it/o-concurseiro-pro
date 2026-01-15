@@ -63,6 +63,7 @@ export interface Cargo {
   nivel: Nivel;
   vagasAmplas: number;
   vagasPcd: number;
+  vagasPn: number;
   vagasCR: number;
   totalVagas: number;
   salario: string;

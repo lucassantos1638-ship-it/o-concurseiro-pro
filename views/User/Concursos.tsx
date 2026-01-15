@@ -324,7 +324,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                             <span className="font-black text-emerald-600 text-xs">{cargo.salario || 'A definir'}</span>
                           </td>
                           <td className="p-5 text-center">
-                            <span className="font-bold text-slate-700 text-xs">{cargo.vagasAmplas + cargo.vagasPcd}</span>
+                            <span className="font-bold text-slate-700 text-xs">{cargo.vagasAmplas + cargo.vagasPcd + (cargo.vagasPn || 0)}</span>
                           </td>
                           <td className="p-5 text-center">
                             <span className="font-bold text-slate-400 text-xs">{cargo.vagasCR > 0 ? cargo.vagasCR : '-'}</span>
@@ -364,7 +364,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                         </div>
                         <div>
                           <span className="text-[8px] font-black text-slate-400 uppercase block mb-0.5">Vagas</span>
-                          <span className="font-bold text-slate-700 text-xs">{cargo.vagasAmplas + cargo.vagasPcd}</span>
+                          <span className="font-bold text-slate-700 text-xs">{cargo.vagasAmplas + cargo.vagasPcd + (cargo.vagasPn || 0)}</span>
                         </div>
                         <div>
                           <span className="text-[8px] font-black text-slate-400 uppercase block mb-0.5">CR</span>

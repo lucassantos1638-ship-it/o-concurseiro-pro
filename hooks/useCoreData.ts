@@ -71,6 +71,7 @@ export function useCoreData() {
                     nivel: c.nivel as Nivel,
                     vagasAmplas: c.vagas_amplas,
                     vagasPcd: c.vagas_pcd,
+                    vagasPn: c.vagas_pn,
                     vagasCR: c.vagas_cr,
                     totalVagas: c.total_vagas,
                     salario: c.salario,

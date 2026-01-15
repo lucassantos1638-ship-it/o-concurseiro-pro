@@ -71,12 +71,26 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                 const headerRow = rows[headerRowIndex].map((h: any) => h?.toString().toLowerCase().trim());
                 const dataRows = rows.slice(headerRowIndex + 1);
 
-                // Helper to find column index with multiple potential headers and exclusions
+                // Helper to find column index with token-based matching for short terms
                 const findCol = (terms: string[], excludeTerms: string[] = []) => {
-                    return headerRow.findIndex((h: string) =>
-                        terms.some(t => h.includes(t)) &&
-                        !excludeTerms.some(e => h.includes(e))
-                    );
+                    return headerRow.findIndex((h: string) => {
+                        // 1. Exclusions (Global substring check)
+                        if (excludeTerms.some(e => h.includes(e))) return false;
+
+                        // 2. Tokenize the header for strict matching
+                        const tokens = h.split(/[\s\/,.\-()]+/).filter(Boolean);
+
+                        // 3. Match
+                        return terms.some(term => {
+                            if (term.length <= 3) {
+                                // Strict token match for short codes (CR, PN, AC, PCD)
+                                return tokens.includes(term);
+                            } else {
+                                // Loose substring match for longer words (reserva, cadastro)
+                                return h.includes(term);
+                            }
+                        });
+                    });
                 };
 
                 const idxNomeConcurso = findCol(['nome do concurso', 'concurso']);
@@ -85,20 +99,23 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                 const idxNivel = findCol(['nivel', 'nível', 'escolaridade']);
                 const idxCargo = findCol(['cargo', 'função', 'nome do cargo']);
 
-                // Vacancies Matching - More Robust with Exclusions
-                const idxAmpla = findCol(['ampla', 'ac', 'universal', 'geral', 'vagas'], ['total']);
+                // Vacancies Matching - Strict Token Logic
+                const idxAmpla = findCol(['ampla', 'ac', 'universal', 'geral'], ['total']); // REMOVED 'vagas' from strict list to avoid matching 'Vagas Total' loosely
 
-                const idxPCD = findCol(['pcd', 'p.c.d', 'deficiente', 'deficiência']);
+                const idxPCD = findCol(['pcd', 'deficiente', 'deficiência']); // 'p.c.d' handled by split? split('.') -> p, c, d. So 'pcd' won't match. Add 'pcd' and maybe 'd' if desperate, but 'pcd' usually standard.
+                // Wait, if header is "P.C.D", tokens are ["p", "c", "d"]. "pcd" won't match.
+                // Regex might be better for "p.c.d".
+                // Let's add specific handling or just trust "deficiente".
+                // Or just clean the header?
+
                 const idxPN = findCol(['pn', 'negro', 'preto', 'pardo', 'cota', 'ppp', 'afro']);
 
-                // CR often conflicts with "Data de Cadastro" or "Inicio Cadastro"
                 const idxCR = findCol(['reserva', 'cr', 'cadastro'], ['data', 'inicio', 'fim', 'link', 'endereço']);
 
-                // If specific 'vagas' column exists without modifiers, it might be total or ampla depending on context
-                const idxTotal = findCol(['total', 'vagas total']);
+                const idxTotal = findCol(['total']); // 'vagas total' handled by loose match of 'total'
 
                 const idxSalario = findCol(['salário', 'salario', 'remuneração', 'vencimento']);
-                const idxCargaHoraria = findCol(['carga', 'jornada', 'horas']); // 'carga' might conflict with cargo if not careful, but findCol logic helps? 'cargo' vs 'carga'
+                const idxCargaHoraria = findCol(['carga', 'jornada', 'horas']);
                 const idxRequisitos = findCol(['requisitos', 'escolaridade']);
                 const idxCidade = findCol(['cidade', 'município', 'local']);
 

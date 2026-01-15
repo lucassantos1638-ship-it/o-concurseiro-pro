@@ -90,7 +90,7 @@ const AdminConcursos: React.FC<AdminConcursosProps> = ({ state, updateState, onR
             link_oficial: formData.linkCurso || '', // Using linkCurso as official link
             link_inscricoes: formData.linkInscricao || '',
             link_edital: formData.linkEdital || '',
-            link_apostilas: formData.linkApostila || '', // Added missing field
+            link_apostilas: formData.linkApostila || '',
             observacoes: formData.descricao || '',
             image_url: formData.capaUrl || '',
             sub_cover_url: formData.subCapaUrl || '',

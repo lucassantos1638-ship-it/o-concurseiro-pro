@@ -155,7 +155,47 @@ const AdminImportPdf: React.FC<AdminImportPdfProps> = ({ state, updateState }) =
                 }
 
                 for (const mc of materiasDoCargo) {
-                    const mId = materiasMap.get(mc.materia_nome);
+                    let mId = materiasMap.get(mc.materia_nome);
+
+                    // NEW: Auto-parametrize "Conhecimentos..." subjects specific to this cargo
+                    // If the subject starts with "Conhecimento", we create a specific variation
+                    if (mc.materia_nome.match(/^Conhecimento/i)) {
+                        const specificName = `${mc.materia_nome} (${car.nome})`;
+
+                        // Check if this specific one was already created in the batch (unlikely for new import but good practice)
+                        // OR we need to fetch/create it now.
+
+                        // Try to find it in our current batch map first? No, the map has keys as original names.
+                        // Let's just do a find-or-create right here for the specific one.
+
+                        // Quick local check if we didn't already create it in this same loop run (rare but possible if same cargo name twice?)
+                        const { data: existingSpecific } = await supabase
+                            .from('materias')
+                            .select('id')
+                            .eq('nome', specificName)
+                            .maybeSingle();
+
+                        if (existingSpecific) {
+                            mId = existingSpecific.id;
+                        } else {
+                            // Find the original generic materia to get category input?
+                            // We can use mc attributes if available or look up from previewData
+                            const originalMat = previewData.materias.find((m: any) => m.nome === mc.materia_nome);
+
+                            const { data: newSpecific, error: newSpecErr } = await supabase.from('materias').insert({
+                                id: Math.random().toString(36).substr(2, 9),
+                                nome: specificName,
+                                categoria: originalMat?.categoria || 'Conhecimentos Específicos',
+                                nivel_compativel: car.nivel
+                            }).select().single();
+
+                            if (!newSpecErr && newSpecific) {
+                                mId = newSpecific.id;
+                                addLog(`Matéria específica criada: ${specificName}`);
+                            }
+                        }
+                    }
+
                     if (mId) {
                         await supabase.from('cargos_materias').insert({
                             cargo_id: cargoId,

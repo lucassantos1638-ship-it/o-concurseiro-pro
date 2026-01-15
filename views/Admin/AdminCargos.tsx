@@ -152,14 +152,50 @@ const AdminCargos: React.FC<AdminCargosProps> = ({ state, updateState, onRefresh
                 await supabase.from('cargos_materias').delete().eq('cargo_id', cargoId);
 
                 // Insert new configs
+                // Insert new configs
                 if (formData.materiasConfig.length > 0) {
-                    const materiasPayload = formData.materiasConfig.map(mc => ({
-                        cargo_id: cargoId,
-                        materia_id: mc.materiaId,
-                        peso: mc.peso,
-                        quantidade_questoes: mc.quantidadeQuestoes
-                    }));
-                    await supabase.from('cargos_materias').insert(materiasPayload);
+                    const materiasPayload = [];
+
+                    for (const mc of formData.materiasConfig) {
+                        let targetMateriaId = mc.materiaId;
+                        const originalMateria = state.materias.find(m => m.id === mc.materiaId);
+
+                        // Rule: If materia name starts with "Conhecimento", specific-fy it
+                        if (originalMateria && originalMateria.nome.match(/^Conhecimento/i) && !originalMateria.nome.includes(formData.nome)) {
+                            const specificName = `${originalMateria.nome} (${formData.nome})`;
+
+                            // Check if exists
+                            const { data: existing } = await supabase.from('materias').select('id').eq('nome', specificName).maybeSingle();
+
+                            if (existing) {
+                                targetMateriaId = existing.id;
+                            } else {
+                                // Create new
+                                const id = Math.random().toString(36).substr(2, 9);
+                                const { data: newMat, error: errNew } = await supabase.from('materias').insert({
+                                    id,
+                                    nome: specificName,
+                                    categoria: originalMateria.categoria,
+                                    nivel_compativel: originalMateria.nivelCompativel
+                                }).select().single();
+
+                                if (!errNew && newMat) {
+                                    targetMateriaId = newMat.id;
+                                }
+                            }
+                        }
+
+                        materiasPayload.push({
+                            cargo_id: cargoId,
+                            materia_id: targetMateriaId,
+                            peso: mc.peso,
+                            quantidade_questoes: mc.quantidadeQuestoes
+                        });
+                    }
+
+                    if (materiasPayload.length > 0) {
+                        await supabase.from('cargos_materias').insert(materiasPayload);
+                    }
                 }
             }
 

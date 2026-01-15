@@ -85,8 +85,8 @@ const UserQuestoes: React.FC<UserQuestoesProps> = ({ state, onStart }) => {
                         >
                             <div className="relative z-10">
                                 <span className={`inline-block px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest mb-4 ${nivel === 'Superior' ? 'bg-purple-100 text-purple-600' :
-                                        nivel === 'Médio' ? 'bg-blue-100 text-blue-600' :
-                                            'bg-emerald-100 text-emerald-600'
+                                    nivel === 'Médio' ? 'bg-blue-100 text-blue-600' :
+                                        'bg-emerald-100 text-emerald-600'
                                     }`}>
                                     Escolaridade
                                 </span>
@@ -235,8 +235,8 @@ const UserQuestoes: React.FC<UserQuestoesProps> = ({ state, onStart }) => {
                                         menu_book
                                     </span>
                                 </div>
-                                <div className="min-w-0">
-                                    <h3 className="font-bold text-slate-800 text-sm leading-tight group-hover:text-primary transition-colors truncate">{materia.nome}</h3>
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="font-bold text-slate-800 text-sm leading-tight group-hover:text-primary transition-colors line-clamp-3 md:line-clamp-none">{materia.nome}</h3>
                                     <span className="text-[10px] font-bold text-slate-400 mt-0.5 block uppercase tracking-wide">{questaoCount} questões</span>
                                 </div>
                             </button>

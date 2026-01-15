@@ -71,9 +71,12 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                 const headerRow = rows[headerRowIndex].map((h: any) => h?.toString().toLowerCase().trim());
                 const dataRows = rows.slice(headerRowIndex + 1);
 
-                // Helper to find column index with multiple potential headers
-                const findCol = (terms: string[]) => {
-                    return headerRow.findIndex((h: string) => terms.some(t => h.includes(t)));
+                // Helper to find column index with multiple potential headers and exclusions
+                const findCol = (terms: string[], excludeTerms: string[] = []) => {
+                    return headerRow.findIndex((h: string) =>
+                        terms.some(t => h.includes(t)) &&
+                        !excludeTerms.some(e => h.includes(e))
+                    );
                 };
 
                 const idxNomeConcurso = findCol(['nome do concurso', 'concurso']);
@@ -82,19 +85,20 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                 const idxNivel = findCol(['nivel', 'nível', 'escolaridade']);
                 const idxCargo = findCol(['cargo', 'função', 'nome do cargo']);
 
-                // Vacancies Matching - More Robust
-                const idxAmpla = findCol(['ampla', 'ac', 'universal', 'geral', 'vagas']); // 'vagas' is risky if generic, put lat
-                // Better strategy: strict checks first
+                // Vacancies Matching - More Robust with Exclusions
+                const idxAmpla = findCol(['ampla', 'ac', 'universal', 'geral', 'vagas'], ['total']);
+
                 const idxPCD = findCol(['pcd', 'p.c.d', 'deficiente', 'deficiência']);
                 const idxPN = findCol(['pn', 'negro', 'preto', 'pardo', 'cota', 'ppp', 'afro']);
-                const idxCR = findCol(['reserva', 'cr', 'cadastro']);
+
+                // CR often conflicts with "Data de Cadastro" or "Inicio Cadastro"
+                const idxCR = findCol(['reserva', 'cr', 'cadastro'], ['data', 'inicio', 'fim', 'link', 'endereço']);
 
                 // If specific 'vagas' column exists without modifiers, it might be total or ampla depending on context
-                // Let's assume 'total' explicit header takes precedence
                 const idxTotal = findCol(['total', 'vagas total']);
 
                 const idxSalario = findCol(['salário', 'salario', 'remuneração', 'vencimento']);
-                const idxCargaHoraria = findCol(['carga', 'jornada', 'horas']);
+                const idxCargaHoraria = findCol(['carga', 'jornada', 'horas']); // 'carga' might conflict with cargo if not careful, but findCol logic helps? 'cargo' vs 'carga'
                 const idxRequisitos = findCol(['requisitos', 'escolaridade']);
                 const idxCidade = findCol(['cidade', 'município', 'local']);
 
@@ -127,7 +131,11 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                     if (!val) return 0;
                     const str = val.toString().replace(/\D/g, ''); // Extract digits only
                     const num = parseInt(str);
-                    return isNaN(num) ? 0 : num;
+                    if (isNaN(num)) return 0;
+                    // Sanity: If > 20000, it's likely a date serial (today is ~45000) or salary. 
+                    // Unlikely to have 20000 vacancies in one cargo line.
+                    if (num > 20000) return 0;
+                    return num;
                 };
 
                 // Extract Cargos

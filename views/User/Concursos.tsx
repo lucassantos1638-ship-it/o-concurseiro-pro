@@ -302,6 +302,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                         <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Nível</th>
                         <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Salário</th>
                         <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Vagas</th>
+                        <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">CR</th>
                         <th className="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest pr-8"></th>
                       </tr>
                     </thead>
@@ -323,7 +324,10 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                             <span className="font-black text-emerald-600 text-xs">{cargo.salario || 'A definir'}</span>
                           </td>
                           <td className="p-5 text-center">
-                            <span className="font-bold text-slate-700 text-xs">{cargo.totalVagas}</span>
+                            <span className="font-bold text-slate-700 text-xs">{cargo.vagasAmplas + cargo.vagasPcd}</span>
+                          </td>
+                          <td className="p-5 text-center">
+                            <span className="font-bold text-slate-400 text-xs">{cargo.vagasCR > 0 ? cargo.vagasCR : '-'}</span>
                           </td>
                           <td className="p-5 pr-8 text-right">
                             <button
@@ -353,14 +357,18 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="grid grid-cols-3 gap-4 mb-4">
                         <div>
                           <span className="text-[8px] font-black text-slate-400 uppercase block mb-0.5">Salário</span>
                           <span className="font-black text-emerald-600 text-xs">{cargo.salario || 'A definir'}</span>
                         </div>
                         <div>
                           <span className="text-[8px] font-black text-slate-400 uppercase block mb-0.5">Vagas</span>
-                          <span className="font-bold text-slate-700 text-xs">{cargo.totalVagas} vagas</span>
+                          <span className="font-bold text-slate-700 text-xs">{cargo.vagasAmplas + cargo.vagasPcd}</span>
+                        </div>
+                        <div>
+                          <span className="text-[8px] font-black text-slate-400 uppercase block mb-0.5">CR</span>
+                          <span className="font-bold text-slate-500 text-xs">{cargo.vagasCR > 0 ? cargo.vagasCR : '-'}</span>
                         </div>
                       </div>
 

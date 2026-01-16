@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { AppState } from '../../types';
+import { formatCurrency } from '../../utils/formatters';
 
 interface SimuladoCargoViewProps {
   state: AppState;
@@ -65,7 +66,7 @@ const SimuladoCargoView: React.FC<SimuladoCargoViewProps> = ({ state, cargoId, o
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           <div className="bg-white p-5 rounded-[24px] border border-slate-50 text-center shadow-sm">
             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Salário</span>
-            <p className="font-black text-emerald-600 text-base md:text-lg">{cargo.salario}</p>
+            <p className="font-black text-emerald-600 text-base md:text-lg">{formatCurrency(cargo.salario)}</p>
           </div>
           <div className="bg-white p-5 rounded-[24px] border border-slate-50 text-center shadow-sm">
             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Vagas AC</span>

@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { AppState, Concurso, Cargo, Nivel } from '../../types';
 import { getConcursoStatus } from '../../utils/concursoStatus';
+import { formatCurrency } from '../../utils/formatters';
 
 interface ConcursosProps {
   state: AppState;
@@ -119,7 +120,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                       <span className="material-symbols-outlined text-emerald-600">payments</span>
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Salário</span>
                     </div>
-                    <p className="text-sm font-black text-emerald-600 ml-4">{cargo.salario || 'Ver edital'}</p>
+                    <p className="text-sm font-black text-emerald-600 ml-4">{formatCurrency(cargo.salario)}</p>
                   </div>
 
                   <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
@@ -208,6 +209,27 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
     }
   }
 
+
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedState]);
+
+  const totalPages = Math.ceil(filteredConcursos.length / ITEMS_PER_PAGE);
+
+  const paginatedConcursos = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredConcursos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredConcursos, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (selectedConcurso) {
     const cargosDoConcurso = state.cargos.filter(cargo => cargo.concursoId === selectedConcursoId);
     const status = getDynamicStatus(selectedConcurso);
@@ -258,7 +280,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                 </div>
                 <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
                   <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Salários até</span>
-                  <p className="text-sm md:text-xl font-black text-emerald-600 truncate">{selectedConcurso.salarioMaximo || 'A definir'}</p>
+                  <p className="text-sm md:text-xl font-black text-emerald-600 truncate">{formatCurrency(selectedConcurso.salarioMaximo)}</p>
                 </div>
                 <div className="bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100">
                   <span className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Vagas (AC + PCD)</span>
@@ -325,7 +347,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                             </span>
                           </td>
                           <td className="p-5">
-                            <span className="font-black text-emerald-600 text-xs">{cargo.salario || 'A definir'}</span>
+                            <span className="font-black text-emerald-600 text-xs">{formatCurrency(cargo.salario)}</span>
                           </td>
                           <td className="p-5 text-center">
                             <span className="font-bold text-slate-700 text-xs">{cargo.vagasAmplas + cargo.vagasPcd + (cargo.vagasPn || 0)}</span>
@@ -364,7 +386,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                       <div className="grid grid-cols-3 gap-4 mb-4">
                         <div>
                           <span className="text-[8px] font-black text-slate-400 uppercase block mb-0.5">Salário</span>
-                          <span className="font-black text-emerald-600 text-xs">{cargo.salario || 'A definir'}</span>
+                          <span className="font-black text-emerald-600 text-xs">{formatCurrency(cargo.salario)}</span>
                         </div>
                         <div>
                           <span className="text-[8px] font-black text-slate-400 uppercase block mb-0.5">Vagas</span>
@@ -439,7 +461,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:gap-5">
-          {filteredConcursos.map(concurso => {
+          {paginatedConcursos.map(concurso => {
             const status = getDynamicStatus(concurso);
             const cargosRelacionados = state.cargos.filter(cg => cg.concursoId === concurso.id);
             const nivelExibicao = cargosRelacionados[0]?.nivel || 'Ver Detalhes';
@@ -476,7 +498,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-x-4 gap-y-4 pt-4 mt-4 border-t border-slate-50">
                       <div className="flex flex-col">
                         <span className="text-[9px] font-bold text-slate-400 uppercase">Salário Máx</span>
-                        <span className="text-xs font-bold text-[#111827] mt-0.5 truncate">{concurso.salarioMaximo || '-'}</span>
+                        <span className="text-xs font-bold text-[#111827] mt-0.5 truncate">{formatCurrency(concurso.salarioMaximo)}</span>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-[9px] font-bold text-slate-400 uppercase">Vagas</span>
@@ -518,6 +540,40 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
             </div>
           )}
         </div>
+
+        {/* Pagination Controls */}
+        {filteredConcursos.length > 0 && (
+          <div className="flex justify-between items-center mt-8 pt-4 border-t border-slate-200">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${currentPage === 1
+                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                : 'bg-white text-slate-700 hover:bg-white hover:text-primary hover:shadow-md'
+                }`}
+            >
+              <span className="material-symbols-outlined text-base">arrow_back</span>
+              Anterior
+            </button>
+
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              Página {currentPage} de {totalPages}
+            </span>
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${currentPage === totalPages
+                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                : 'bg-white text-slate-700 hover:bg-white hover:text-primary hover:shadow-md'
+                }`}
+            >
+              Próxima
+              <span className="material-symbols-outlined text-base">arrow_forward</span>
+            </button>
+          </div>
+        )}
+
       </div>
     </div>
   );

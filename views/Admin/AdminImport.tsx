@@ -413,7 +413,7 @@ const AdminImport: React.FC<AdminImportProps> = ({ state, updateState }) => {
                                                 {cargo.vagasAmplas} AC / {cargo.vagasPn} PN / {cargo.vagasCR} CR
                                             </span>
                                         </td>
-                                        <td className="p-6 text-sm font-black text-emerald-600 whitespace-nowrap">{cargo.salario}</td>
+                                        <td className="p-6 text-sm font-black text-emerald-600 whitespace-nowrap">{formatCurrency(cargo.salario)}</td>
                                         <td className="p-6 text-[10px] font-medium text-slate-400 max-w-[200px] truncate" title={cargo.requisitos}>{cargo.requisitos || '-'}</td>
                                     </tr>
                                 ))}

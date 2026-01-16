@@ -25,11 +25,106 @@ export function useUserData(session: Session | null) {
     });
 
     const [myCargosIds, setMyCargosIds] = useState<string[]>([]);
+
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchUserData = async () => {
+        if (!session?.user) return;
+
+        setLoading(true);
+        setError(null);
+        const user = session.user;
+
+        try {
+            // 1. Fetch ou Create Profile
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (profileError && profileError.code === 'PGRST116') {
+                // Profile não existe, criar padrão
+                const defaultProfile = {
+                    id: user.id,
+                    name: user.user_metadata?.full_name || 'Novo Usuário',
+                    city: 'Não informado',
+                    state: 'Não informado',
+                    profile_picture: '',
+                    my_cargos_ids: [],
+                    plan: 'free'
+                };
+
+                const { error: insertError } = await supabase.from('profiles').insert(defaultProfile);
+                if (insertError) throw insertError;
+
+                setProfile({
+                    name: defaultProfile.name,
+                    city: defaultProfile.city,
+                    state: defaultProfile.state,
+                    profilePicture: defaultProfile.profile_picture,
+                    plan: 'free',
+                    age: undefined,
+                    isPcd: false
+                });
+                setMyCargosIds([]);
+            } else if (profileData) {
+                setProfile({
+                    name: profileData.name,
+                    city: profileData.city || '',
+                    state: profileData.state || '',
+                    profilePicture: profileData.profile_picture || '',
+                    plan: (profileData.plan as 'free' | 'pro') || 'free',
+                    age: profileData.age,
+                    isPcd: profileData.is_pcd
+                });
+                setMyCargosIds(profileData.my_cargos_ids || []);
+            } else if (profileError) {
+                throw profileError;
+            }
+
+            // 2. Fetch ou Create Progress
+            const { data: progressData, error: progressError } = await supabase
+                .from('user_progress')
+                .select('*')
+                .eq('user_id', user.id)
+                .single();
+
+            if (progressError && progressError.code === 'PGRST116') {
+                const defaultProgress = {
+                    user_id: user.id,
+                    hours_studied: 0,
+                    questions_resolved: 0,
+                    accuracy_rate: 0,
+                    history: []
+                };
+                const { error: insertProgressError } = await supabase.from('user_progress').insert(defaultProgress);
+                if (insertProgressError) throw insertProgressError;
+                // Mantém state inicial zerado
+            } else if (progressData) {
+                setProgress({
+                    hoursStudied: Number(progressData.hours_studied),
+                    questionsResolved: progressData.questions_resolved,
+                    accuracyRate: Number(progressData.accuracy_rate),
+                    history: progressData.history || []
+                });
+            } else if (progressError) {
+                throw progressError;
+            }
+
+        } catch (error: any) {
+            console.error('Erro ao carregar dados do usuário:', error);
+            setError(error.message || 'Erro ao carregar dados');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
 
     useEffect(() => {
         if (!session?.user) {
-            // Se não tem sessão, limpa os dados
             setProfile({
                 name: '',
                 state: '',
@@ -48,89 +143,6 @@ export function useUserData(session: Session | null) {
             setMyCargosIds([]);
             return;
         }
-
-        const fetchUserData = async () => {
-            setLoading(true);
-            const user = session.user;
-
-            try {
-                // 1. Fetch ou Create Profile
-                const { data: profileData, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', user.id)
-                    .single();
-
-                if (profileError && profileError.code === 'PGRST116') {
-                    // Profile não existe, criar padrão
-                    const defaultProfile = {
-                        id: user.id,
-                        name: user.user_metadata?.full_name || 'Novo Usuário',
-                        city: 'Não informado',
-                        state: 'Não informado',
-                        profile_picture: '',
-                        my_cargos_ids: [],
-                        plan: 'free'
-                    };
-
-                    const { error: insertError } = await supabase.from('profiles').insert(defaultProfile);
-                    if (!insertError) {
-                        setProfile({
-                            name: defaultProfile.name,
-                            city: defaultProfile.city,
-                            state: defaultProfile.state,
-                            profilePicture: defaultProfile.profile_picture,
-                            plan: 'free',
-                            age: undefined,
-                            isPcd: false
-                        });
-                        setMyCargosIds([]);
-                    }
-                } else if (profileData) {
-                    setProfile({
-                        name: profileData.name,
-                        city: profileData.city || '',
-                        state: profileData.state || '',
-                        profilePicture: profileData.profile_picture || '',
-                        plan: (profileData.plan as 'free' | 'pro') || 'free',
-                        age: profileData.age,
-                        isPcd: profileData.is_pcd
-                    });
-                    setMyCargosIds(profileData.my_cargos_ids || []);
-                }
-
-                // 2. Fetch ou Create Progress
-                const { data: progressData, error: progressError } = await supabase
-                    .from('user_progress')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .single();
-
-                if (progressError && progressError.code === 'PGRST116') {
-                    const defaultProgress = {
-                        user_id: user.id,
-                        hours_studied: 0,
-                        questions_resolved: 0,
-                        accuracy_rate: 0,
-                        history: []
-                    };
-                    await supabase.from('user_progress').insert(defaultProgress);
-                    // Mantém state inicial zerado
-                } else if (progressData) {
-                    setProgress({
-                        hoursStudied: Number(progressData.hours_studied),
-                        questionsResolved: progressData.questions_resolved,
-                        accuracyRate: Number(progressData.accuracy_rate),
-                        history: progressData.history || []
-                    });
-                }
-
-            } catch (error) {
-                console.error('Erro ao carregar dados do usuário:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
 
         fetchUserData();
 
@@ -213,6 +225,8 @@ export function useUserData(session: Session | null) {
         loading,
         updateProfile,
         updateMyCargos,
-        updateProgress
+        updateProgress,
+        error,
+        refetch: fetchUserData
     };
 }

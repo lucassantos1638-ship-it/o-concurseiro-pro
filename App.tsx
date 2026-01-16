@@ -1,29 +1,32 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { AppState, Cargo, Materia, UserProfile } from './types';
 import { INITIAL_STATE } from './constants';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
-import AuthView from './views/Auth/AuthView';
+import ProGuard from './components/ProGuard';
+import ChatPanel from './components/ChatPanel';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import UserDashboard from './views/User/Dashboard';
-import UserConcursos from './views/User/Concursos';
-import UserCargos from './views/User/MyCargos';
-import UserDesempenho from './views/User/Desempenho';
-import UserRanking from './views/User/Ranking';
-import UserProfileView from './views/User/Profile';
-import SimuladoCargoView from './views/User/SimuladoCargoView';
-import SimuladoQuestaoView from './views/User/SimuladoQuestaoView';
-import UserQuestoes from './views/User/Questoes';
-import ProGuard from './components/ProGuard';
-import AdminLayout from './views/Admin/AdminLayout';
-import ChatPanel from './components/ChatPanel';
 import { useUserData } from './hooks/useUserData';
 import { useRanking } from './hooks/useRanking';
-
 import { useCoreData } from './hooks/useCoreData';
 import DraggableChatButton from './components/DraggableChatButton';
+import ConnectionErrorView from './components/ConnectionErrorView';
+import PageLoading from './components/PageLoading';
+
+// Lazy Load Views for Better Performance
+const AuthView = lazy(() => import('./views/Auth/AuthView'));
+const UserDashboard = lazy(() => import('./views/User/Dashboard'));
+const UserConcursos = lazy(() => import('./views/User/Concursos'));
+const UserCargos = lazy(() => import('./views/User/MyCargos'));
+const UserDesempenho = lazy(() => import('./views/User/Desempenho'));
+const UserRanking = lazy(() => import('./views/User/Ranking'));
+const UserProfileView = lazy(() => import('./views/User/Profile'));
+const SimuladoCargoView = lazy(() => import('./views/User/SimuladoCargoView'));
+const SimuladoQuestaoView = lazy(() => import('./views/User/SimuladoQuestaoView'));
+const UserQuestoes = lazy(() => import('./views/User/Questoes'));
+const AdminLayout = lazy(() => import('./views/Admin/AdminLayout'));
 
 const App: React.FC = () => {
   // Estado inicial vazio, será preenchido pelo hook useCoreData
@@ -84,8 +87,8 @@ const App: React.FC = () => {
   }, []);
 
   /* Hooks de Dados (Sincronizados com Supabase) */
-  const { profile, progress, myCargosIds, loading: loadingData, updateProfile, updateMyCargos, updateProgress } = useUserData(session);
-  const { concursos, cargos, materias, questoes, loading: loadingCore, refreshData } = useCoreData();
+  const { profile, progress, myCargosIds, loading: loadingData, updateProfile, updateMyCargos, updateProgress, error: userDataError, refetch: refetchUserData } = useUserData(session);
+  const { concursos, cargos, materias, questoes, loading: loadingCore, refreshData, error: coreDataError } = useCoreData();
   const { ranking } = useRanking();
 
   // Sincronizar dados do Hook com o AppState Local
@@ -218,7 +221,7 @@ const App: React.FC = () => {
 
     switch (activeTab) {
       case 'dashboard':
-        return <UserDashboard state={state} setActiveTab={setActiveTab} />;
+        return <UserDashboard state={state} setActiveTab={setActiveTab} isLoading={loadingCore} />;
       case 'ranking':
         return <UserRanking state={state} />;
       case 'concursos':
@@ -280,10 +283,26 @@ const App: React.FC = () => {
   }
 
   if (!session) {
-    return <AuthView />;
+    return (
+      <Suspense fallback={<PageLoading />}>
+        <AuthView />
+      </Suspense>
+    );
   }
 
   const isUserAdmin = session.user.email === 'lucassantos1638@gmail.com';
+
+  if (userDataError || coreDataError) {
+    return (
+      <ConnectionErrorView
+        message={userDataError || coreDataError || undefined}
+        onRetry={() => {
+          if (userDataError) refetchUserData();
+          if (coreDataError) refreshData();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="flex h-[100dvh] bg-[#f6f6f8] overflow-hidden font-sans">
@@ -325,7 +344,9 @@ const App: React.FC = () => {
           />
         )}
         <main className="flex-1 overflow-y-auto">
-          {renderContent()}
+          <Suspense fallback={<PageLoading />}>
+            {renderContent()}
+          </Suspense>
         </main>
 
         {!isAdmin && (

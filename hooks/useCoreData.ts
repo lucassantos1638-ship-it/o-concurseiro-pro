@@ -8,12 +8,33 @@ export function useCoreData() {
     const [materias, setMaterias] = useState<Materia[]>([]);
     const [questoes, setQuestoes] = useState<Questao[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchData = async () => {
         setLoading(true);
+        setError(null);
         try {
-            // 1. Fetch Concursos
-            const { data: concursosData } = await supabase.from('concursos').select('*');
+            // Execute all fetches in parallel
+            const [
+                { data: concursosData, error: concursosError },
+                { data: materiasData, error: materiasError },
+                { data: cargosData, error: cargosError },
+                { data: cargosMateriasData, error: cargosMateriasError },
+                { data: questoesData, error: questoesError }
+            ] = await Promise.all([
+                supabase.from('concursos').select('*'),
+                supabase.from('materias').select('*'),
+                supabase.from('cargos').select('*'),
+                supabase.from('cargos_materias').select('*'),
+                supabase.from('questoes').select('*')
+            ]);
+
+            // Check for critical errors (optional: could throw if any critical fail)
+            if (concursosError) throw concursosError;
+            if (materiasError) throw materiasError;
+            if (cargosError) throw cargosError;
+
+            // 1. Map Concursos
             const mappedConcursos: Concurso[] = (concursosData || []).map(c => ({
                 id: c.id,
                 nome: c.nome,
@@ -32,7 +53,7 @@ export function useCoreData() {
                     inscricoes: c.link_inscricoes,
                     editalPdf: c.link_edital,
                     apostilas: c.link_apostilas,
-                    cursos: c.link_cursos // Mapping explicitly if needed, though Admin uses oficial for courses
+                    cursos: c.link_cursos
                 },
                 observacoes: c.observacoes,
                 imageUrl: c.image_url,
@@ -41,8 +62,7 @@ export function useCoreData() {
                 salarioMaximo: c.salario_maximo
             }));
 
-            // 2. Fetch Materias
-            const { data: materiasData } = await supabase.from('materias').select('*');
+            // 2. Map Materias
             const mappedMaterias: Materia[] = (materiasData || []).map(m => ({
                 id: m.id,
                 nome: m.nome,
@@ -51,10 +71,7 @@ export function useCoreData() {
                 nivelCompativel: m.nivel_compativel as Nivel
             }));
 
-            // 3. Fetch Cargos & Relations (CargosMaterias)
-            const { data: cargosData } = await supabase.from('cargos').select('*');
-            const { data: cargosMateriasData } = await supabase.from('cargos_materias').select('*');
-
+            // 3. Map Cargos
             const mappedCargos: Cargo[] = (cargosData || []).map(c => {
                 const configs = (cargosMateriasData || [])
                     .filter((cm: any) => cm.cargo_id === c.id)
@@ -81,8 +98,7 @@ export function useCoreData() {
                 };
             });
 
-            // 4. Fetch Questoes
-            const { data: questoesData } = await supabase.from('questoes').select('*');
+            // 4. Map Questoes
             const mappedQuestoes: Questao[] = (questoesData || []).map(q => ({
                 id: q.id,
                 codigo: q.codigo,
@@ -104,8 +120,9 @@ export function useCoreData() {
             setCargos(mappedCargos);
             setQuestoes(mappedQuestoes);
 
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error fetching core data:', error);
+            setError(error.message || 'Erro ao carregar dados essenciais');
         } finally {
             setLoading(false);
         }
@@ -115,5 +132,5 @@ export function useCoreData() {
         fetchData();
     }, []);
 
-    return { concursos, cargos, materias, questoes, loading, refreshData: fetchData };
+    return { concursos, cargos, materias, questoes, loading, error, refreshData: fetchData };
 }

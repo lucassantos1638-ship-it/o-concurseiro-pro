@@ -11,8 +11,8 @@ interface SimuladoCargoViewProps {
 }
 
 const SimuladoCargoView: React.FC<SimuladoCargoViewProps> = ({ state, cargoId, onBack, onStart }) => {
-  const cargo = state.cargos.find(c => c.id === cargoId);
-  const concurso = state.concursos.find(c => c.id === cargo?.concursoId);
+  const cargo = state.cargos?.find(c => c.id === cargoId);
+  const concurso = state.concursos?.find(c => c.id === cargo?.concursoId);
   const [selectedMateriaId, setSelectedMateriaId] = useState<string | null>(null);
   const [showProModal, setShowProModal] = useState(false);
 
@@ -90,8 +90,8 @@ const SimuladoCargoView: React.FC<SimuladoCargoViewProps> = ({ state, cargoId, o
           </div>
 
           <div className="flex flex-col gap-3">
-            {cargo.materiasConfig.map(config => {
-              const materia = state.materias.find(m => m.id === config.materiaId);
+            {(cargo.materiasConfig || []).map(config => {
+              const materia = state.materias?.find(m => m.id === config.materiaId);
               const isSelected = selectedMateriaId === config.materiaId;
 
               return (
@@ -129,7 +129,7 @@ const SimuladoCargoView: React.FC<SimuladoCargoViewProps> = ({ state, cargoId, o
               );
             })}
 
-            {cargo.materiasConfig.length === 0 && (
+            {(!cargo.materiasConfig || cargo.materiasConfig.length === 0) && (
               <div className="p-16 text-center border-2 border-dashed border-slate-100 rounded-[32px] bg-white">
                 <span className="material-symbols-outlined text-slate-200 text-5xl mb-3">inventory_2</span>
                 <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Nenhuma matéria configurada neste edital</p>

@@ -240,7 +240,14 @@ const App: React.FC = () => {
         />;
       case 'meus-cargos':
         return (
-          <UserCargos state={state} onSelectCargo={(id) => setSimuladoCargoId(id)} />
+          <UserCargos
+            state={state}
+            onSelectCargo={(id) => setSimuladoCargoId(id)}
+            onRemoveCargo={(id) => {
+              const newIds = state.myCargosIds.filter(i => i !== id);
+              handleUpdateState({ myCargosIds: newIds });
+            }}
+          />
         );
       case 'questoes':
         return (

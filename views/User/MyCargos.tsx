@@ -21,8 +21,6 @@ const UserCargos: React.FC<MyCargosProps> = ({ state, onSelectCargo, onRemoveCar
   }
 
   const myCargos = state.cargos.filter(c => state.myCargosIds.includes(c.id));
-
-  return (
   const [cargoToRemove, setCargoToRemove] = React.useState<string | null>(null);
 
   return (

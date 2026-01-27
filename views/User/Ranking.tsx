@@ -54,9 +54,9 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
     }
 
     // Fallback se nada selecionado (retorna vazio ou apenas meus cargos)
-    return list
-      .filter(r => state.myCargosIds.includes(r.cargoId))
-      .sort((a, b) => b.accuracyRate - a.accuracyRate);
+    // Se não tiver cargo selecionado (ex: 'all'), retornamos vazio.
+    // O ranking só deve ser exibido PARA um cargo específico.
+    return [];
 
   }, [state.ranking, state.userProfile, state.userProgress, selectedCargoId, state.myCargosIds]);
 
@@ -360,7 +360,7 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
         fullRanking.length === 0 && (
           <div className="p-20 text-center flex flex-col items-center">
             <span className="material-symbols-outlined text-5xl text-slate-100 mb-4">leaderboard</span>
-            <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">Nenhum dado para este filtro</p>
+            <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">Selecione um cargo acima para ver o ranking</p>
           </div>
         )
       }

@@ -209,6 +209,7 @@ const App: React.FC = () => {
     if (simuladoCargoId && !isAnswering) {
       return (
         <SimuladoCargoView
+          key={simuladoCargoId}
           state={state}
           cargoId={simuladoCargoId}
           onBack={() => setSimuladoCargoId(null)}

@@ -9,6 +9,16 @@ interface MyCargosProps {
 }
 
 const UserCargos: React.FC<MyCargosProps> = ({ state, onSelectCargo }) => {
+  // Defensive check for state
+  if (!state || !state.cargos || !state.myCargosIds) {
+    return (
+      <div className="p-20 text-center flex flex-col items-center">
+        <span className="material-symbols-outlined text-4xl text-slate-300 mb-2 animate-spin">sync</span>
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Carregando dados...</p>
+      </div>
+    );
+  }
+
   const myCargos = state.cargos.filter(c => state.myCargosIds.includes(c.id));
 
   return (
@@ -27,7 +37,7 @@ const UserCargos: React.FC<MyCargosProps> = ({ state, onSelectCargo }) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {myCargos.map(cargo => {
-            const concurso = state.concursos.find(c => c.id === cargo.concursoId);
+            const concurso = state.concursos?.find(c => c.id === cargo.concursoId);
             return (
               <div key={cargo.id} className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden flex flex-col hover:shadow-xl transition-all group">
                 <div className="h-32 bg-slate-100 relative overflow-hidden shrink-0">
@@ -53,7 +63,7 @@ const UserCargos: React.FC<MyCargosProps> = ({ state, onSelectCargo }) => {
                     </div>
                     <div className="flex items-center justify-between text-[11px] font-bold">
                       <span className="text-slate-400 uppercase">Matérias</span>
-                      <span className="text-slate-700 font-black">{cargo.materiasConfig.length} no Edital</span>
+                      <span className="text-slate-700 font-black">{cargo.materiasConfig?.length || 0} no Edital</span>
                     </div>
                   </div>
 

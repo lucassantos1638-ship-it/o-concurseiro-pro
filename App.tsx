@@ -14,6 +14,7 @@ import { useCoreData } from './hooks/useCoreData';
 import DraggableChatButton from './components/DraggableChatButton';
 import ConnectionErrorView from './components/ConnectionErrorView';
 import PageLoading from './components/PageLoading';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy Load Views for Better Performance
 const AuthView = lazy(() => import('./views/Auth/AuthView'));
@@ -343,10 +344,16 @@ const App: React.FC = () => {
             onProfileClick={() => setActiveTab('perfil')}
           />
         )}
-        <main className="flex-1 overflow-y-auto">
-          <Suspense fallback={<PageLoading />}>
-            {renderContent()}
-          </Suspense>
+        <main className="flex-1 overflow-y-auto relative">
+          <ErrorBoundary>
+            <Suspense fallback={<PageLoading />}>
+              {renderContent()}
+            </Suspense>
+          </ErrorBoundary>
+
+          <div className="pointer-events-none fixed bottom-1 right-1 opacity-20 hover:opacity-100 transition-opacity z-50">
+            <span className="text-[8px] font-mono bg-black text-white px-1 rounded">v1.1.0-fix-crash</span>
+          </div>
         </main>
 
         {!isAdmin && (

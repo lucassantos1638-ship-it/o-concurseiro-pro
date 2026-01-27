@@ -116,13 +116,17 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
         message: `Você está dentro das ${vagasDisponiveis} ${labelVagas}. Continue fazendo os simulados e mantenha sua posição de aprovação!`
       };
     } else if (effectiveRank <= vagasDisponiveis + cadastroReserva) {
-      // Nota: Essa lógica de CR está simplificada
+      // Logic for CR Zone
+      const isCrOnly = vagasDisponiveis === 0;
+
       return {
         type: 'warning',
         style: 'bg-amber-50 border-amber-100 text-amber-800',
         icon: 'trending_up',
         title: `Você está no Cadastro de Reserva (Posição ${effectiveRank}º ${isUserPcd ? 'PCD' : ''})`,
-        message: `Faltam poucas posições para entrar nas vagas diretas. Você está na zona do CR. Estude mais e melhore sua posição!`
+        message: isCrOnly
+          ? `Este cargo é exclusivamente para Cadastro de Reserva. Você está bem posicionado na zona de espera. Continue estudando para garantir sua convocação!`
+          : `Faltam poucas posições para entrar nas vagas diretas. Você está na zona do CR. Estude mais e melhore sua posição!`
       };
     } else {
       return {
@@ -130,7 +134,9 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
         style: 'bg-slate-50 border-slate-200 text-slate-600',
         icon: 'school',
         title: `Sua posição atual é ${effectiveRank}º ${isUserPcd ? '(Lista PCD)' : ''}`,
-        message: `Você está fora das vagas e do CR no momento. Lembre-se: este é um simulado com candidatos reais. Intensifique os estudos para subir no ranking!`
+        message: vagasDisponiveis === 0
+          ? `Você está fora da zona de Cadastro de Reserva. Avance ${effectiveRank - cadastroReserva} posições para entrar na lista de espera.`
+          : `Você está fora das vagas e do CR no momento. Lembre-se: este é um simulado com candidatos reais. Intensifique os estudos para subir no ranking!`
       };
     }
   }, [currentCargo, fullRanking, state.userProfile.name, state.userProfile.isPcd]);

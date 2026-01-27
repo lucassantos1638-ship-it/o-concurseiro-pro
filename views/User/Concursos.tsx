@@ -34,6 +34,21 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
     });
   }, [state.concursos, searchQuery, selectedState]);
 
+  // Move hooks to top level to avoid rules of hooks violation
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(filteredConcursos.length / ITEMS_PER_PAGE);
+
+  const paginatedConcursos = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredConcursos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredConcursos, currentPage]);
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedState]);
+
   const selectedConcurso = useMemo(() =>
     state.concursos.find(c => c.id === selectedConcursoId),
     [state.concursos, selectedConcursoId]
@@ -210,21 +225,7 @@ const UserConcursos: React.FC<ConcursosProps> = ({ state, onToggleMyCargo, setAc
   }
 
 
-  const ITEMS_PER_PAGE = 10;
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // Reset to page 1 when filters change
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedState]);
-
-  const totalPages = Math.ceil(filteredConcursos.length / ITEMS_PER_PAGE);
-
-  const paginatedConcursos = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredConcursos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredConcursos, currentPage]);
-
+  // Hooks moved to top
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });

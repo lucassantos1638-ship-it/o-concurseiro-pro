@@ -11,13 +11,15 @@ interface SimuladoCargoViewProps {
 }
 
 const SimuladoCargoView: React.FC<SimuladoCargoViewProps> = ({ state, cargoId, onBack, onStart }) => {
-  const cargo = state.cargos?.find(c => c.id === cargoId);
-  const concurso = state.concursos?.find(c => c.id === cargo?.concursoId);
+  // 1. Hooks FIRST (Always unconditional)
   const [selectedMateriaId, setSelectedMateriaId] = useState<string | null>(null);
   const [showProModal, setShowProModal] = useState(false);
 
-  if (!cargo) return null;
+  // 2. Computed Values
+  const cargo = state.cargos?.find(c => c.id === cargoId);
+  const concurso = state.concursos?.find(c => c.id === cargo?.concursoId);
 
+  // 3. Handlers
   const handleStart = () => {
     if (!selectedMateriaId) return;
 
@@ -29,6 +31,17 @@ const SimuladoCargoView: React.FC<SimuladoCargoViewProps> = ({ state, cargoId, o
 
     onStart(selectedMateriaId);
   };
+
+  // 4. Conditional Rendering Logic (inside return or variable)
+  if (!cargo) {
+    return (
+      <div className="p-20 text-center flex flex-col items-center">
+        <span className="material-symbols-outlined text-4xl text-slate-300 mb-2 animate-spin">sync</span>
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Carregando dados do cargo...</p>
+        <button onClick={onBack} className="mt-4 text-xs text-primary underline">Voltar</button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 md:p-10 pb-80 animate-in fade-in slide-in-from-bottom-4 duration-500">

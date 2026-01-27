@@ -53,7 +53,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ state, onClose, setActiveTab, onU
 
       <ProGuard state={state} title="Chat da Comunidade" onClose={onClose}>
         {/* Header - Com Seletor de Sala */}
-        <div className="flex items-center justify-between bg-white px-5 py-4 border-b border-slate-100 shrink-0">
+        <div className="flex items-center justify-between bg-white px-4 py-3 sm:px-5 sm:py-4 border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-2">
             {selectedCargoId ? (
               <button
@@ -118,7 +118,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ state, onClose, setActiveTab, onU
           ) : (
             /* CHAT ROOM VIEW */
             <>
-              <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-5 hide-scrollbar">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-5 hide-scrollbar overscroll-contain">
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center px-4 opacity-60">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nenhuma mensagem ainda</p>
@@ -146,13 +146,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ state, onClose, setActiveTab, onU
               </div>
 
               {/* Input Area */}
-              <div className="bg-white border-t border-slate-100 p-4 shrink-0 animate-in slide-in-from-bottom-2">
+              <div className="bg-white border-t border-slate-100 p-3 sm:p-4 shrink-0 animate-in slide-in-from-bottom-2 pb-safe">
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2.5">
                   <div className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
                     <input
                       type="text"
                       placeholder="Envie uma mensagem..."
-                      className="w-full bg-transparent text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none"
+                      className="w-full bg-transparent text-base sm:text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none"
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                     />

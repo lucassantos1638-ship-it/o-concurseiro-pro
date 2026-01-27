@@ -146,7 +146,7 @@ const UserRanking: React.FC<RankingProps> = ({ state }) => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Ranking de Elite</h2>
-          <p className="text-slate-500 text-sm font-medium mt-1">Veja sua colocação entre os concorrentes do seu cargo.</p>
+          <p className="text-slate-500 text-sm font-medium mt-1">Veja sua colocação entre os concorrentes do seu cargo cadastrados no O Concurseiro Pro.</p>
         </div>
 
         {/* Mostra posição apenas se tiver dados */}
